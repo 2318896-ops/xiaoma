@@ -1,4 +1,4 @@
-const CACHE_NAME = "xiaoma-v7";
+const CACHE_NAME = "xiaoma-v14";
 const APP_SHELL = [
   "./",
   "./index.html",
