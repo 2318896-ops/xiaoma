@@ -1,0 +1,3917 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#f2eee5">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="小马">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="color-scheme" content="light dark">
+  <title>小马</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png">
+  <style>
+    :root {
+      color-scheme: light dark;
+      background: light-dark(#f2eee5, #141715);
+    }
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      background: light-dark(#f2eee5, #141715);
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overscroll-behavior: none;
+    }
+    body {
+      min-height: 100dvh;
+    }
+    #reply-prototype {
+      min-height: 100dvh;
+    }
+    @media (max-width: 500px) {
+      body {
+        overflow: hidden;
+      }
+    }
+  </style>
+</head>
+<body>
+<script src="./lucide.min.js"></script>
+<div id="reply-prototype">
+  <style>
+    #reply-prototype {
+      color-scheme: light dark;
+      --ink: light-dark(#202621, #f4f1e9);
+      --ink-soft: light-dark(#69716b, #aeb8b0);
+      --paper: light-dark(#f2eee5, #141715);
+      --surface: light-dark(#fffdf8, #222724);
+      --surface-2: light-dark(#f7f2e9, #2b312d);
+      --line: light-dark(#e7e0d4, #3c443e);
+      --accent: light-dark(#326c56, #7cbba0);
+      --accent-soft: light-dark(#e5efe9, #273a31);
+      --accent-ink: light-dark(#225442, #c5ead6);
+      --highlight: light-dark(#e98b70, #ed9b82);
+      --highlight-soft: light-dark(#fae8e1, #442e29);
+      --gold: light-dark(#d6ad61, #e1bf7b);
+      --shadow: light-dark(0 34px 80px rgba(50, 45, 34, .20), 0 34px 80px rgba(0, 0, 0, .48));
+      --phone-shadow: light-dark(0 2px 5px rgba(37, 34, 27, .17), 0 2px 7px rgba(0, 0, 0, .5));
+      --bubble-other: light-dark(#fffdf9, #2d332f);
+      --bubble-me: light-dark(#dcebdc, #315143);
+      --nav-bg: light-dark(rgba(255, 253, 248, .96), rgba(34, 39, 36, .96));
+      display: block;
+      width: 100%;
+      min-width: 0;
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    #reply-prototype * {
+      box-sizing: border-box;
+    }
+
+    #reply-prototype button,
+    #reply-prototype input,
+    #reply-prototype textarea {
+      font: inherit;
+    }
+
+    #reply-prototype button {
+      color: inherit;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    #reply-prototype .proto-stage {
+      display: grid;
+      place-items: center;
+      width: 100%;
+      padding: 18px 0 10px;
+      background:
+        radial-gradient(circle at 18% 12%, color-mix(in srgb, var(--highlight) 12%, transparent) 0 15%, transparent 36%),
+        radial-gradient(circle at 85% 88%, color-mix(in srgb, var(--accent) 13%, transparent) 0 13%, transparent 34%);
+      border-radius: 28px;
+    }
+
+    #reply-prototype .phone {
+      position: relative;
+      width: min(100%, 390px);
+      aspect-ratio: 390 / 812;
+      padding: 8px;
+      overflow: hidden;
+      background: light-dark(#292925, #050605);
+      border: 1px solid light-dark(rgba(255, 255, 255, .45), rgba(255, 255, 255, .12));
+      border-radius: clamp(40px, 12vw, 54px);
+      box-shadow: var(--shadow);
+      container-type: inline-size;
+    }
+
+    #reply-prototype .phone::after {
+      content: "";
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      z-index: 20;
+      width: 96px;
+      height: 24px;
+      background: #050605;
+      border-radius: 99px;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+
+    #reply-prototype .phone-screen {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+      background: var(--surface);
+      border-radius: clamp(33px, 10vw, 46px);
+    }
+
+    #reply-prototype .statusbar {
+      position: relative;
+      z-index: 5;
+      display: flex;
+      flex: 0 0 43px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px 0 25px;
+      color: var(--ink);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: .2px;
+    }
+
+    #reply-prototype .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    #reply-prototype .signal {
+      display: flex;
+      align-items: end;
+      gap: 1.5px;
+      height: 10px;
+    }
+
+    #reply-prototype .signal i {
+      display: block;
+      width: 2px;
+      background: currentColor;
+      border-radius: 2px;
+    }
+
+    #reply-prototype .signal i:nth-child(1) { height: 4px; }
+    #reply-prototype .signal i:nth-child(2) { height: 6px; }
+    #reply-prototype .signal i:nth-child(3) { height: 8px; }
+    #reply-prototype .signal i:nth-child(4) { height: 10px; }
+
+    #reply-prototype .battery {
+      position: relative;
+      width: 18px;
+      height: 9px;
+      border: 1px solid currentColor;
+      border-radius: 3px;
+      opacity: .9;
+    }
+
+    #reply-prototype .battery::before {
+      content: "";
+      position: absolute;
+      inset: 2px;
+      width: 10px;
+      background: currentColor;
+      border-radius: 1px;
+    }
+
+    #reply-prototype .battery::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      right: -3px;
+      width: 2px;
+      height: 3px;
+      background: currentColor;
+      border-radius: 0 2px 2px 0;
+    }
+
+    #reply-prototype .screens {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    #reply-prototype .screen {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      min-height: 0;
+      background: var(--surface);
+    }
+
+    #reply-prototype .screen.is-active {
+      display: flex;
+      animation: reply-screen-in .22s ease-out;
+    }
+
+    @keyframes reply-screen-in {
+      from { opacity: .6; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #reply-prototype .screen.is-active { animation: none; }
+    }
+
+    #reply-prototype .appbar {
+      display: flex;
+      flex: 0 0 58px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2px 18px 6px;
+      background: var(--surface);
+    }
+
+    #reply-prototype .appbar > .brand-copy {
+      flex: 1;
+    }
+
+    #reply-prototype .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+    }
+
+    #reply-prototype .brand-mark {
+      display: grid;
+      flex: 0 0 35px;
+      place-items: center;
+      width: 35px;
+      height: 35px;
+      color: light-dark(#fffaf2, #13231c);
+      font-size: 16px;
+      font-weight: 500;
+      background: var(--accent);
+      border-radius: 12px 12px 12px 5px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .23);
+    }
+
+    #reply-prototype .brand-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      min-width: 0;
+    }
+
+    #reply-prototype .brand-name {
+      font-size: 19px;
+      font-weight: 500;
+      letter-spacing: .5px;
+      line-height: 1.1;
+    }
+
+    #reply-prototype .brand-sub {
+      overflow: hidden;
+      color: var(--ink-soft);
+      font-size: 10.5px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    #reply-prototype .icon-button {
+      display: grid;
+      flex: 0 0 36px;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      color: var(--ink);
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 50%;
+    }
+
+    #reply-prototype .home-body {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 13px;
+      min-height: 0;
+      padding: 5px 17px 17px;
+      overflow: auto;
+      scrollbar-width: none;
+    }
+
+    #reply-prototype .home-body::-webkit-scrollbar,
+    #reply-prototype .analysis-body::-webkit-scrollbar,
+    #reply-prototype .settings-body::-webkit-scrollbar {
+      display: none;
+    }
+
+    #reply-prototype .hero {
+      position: relative;
+      flex: 0 0 105px;
+      padding: 19px 18px;
+      overflow: hidden;
+      background:
+        linear-gradient(125deg, var(--accent-soft), color-mix(in srgb, var(--highlight-soft) 76%, var(--surface)));
+      border: 1px solid color-mix(in srgb, var(--accent) 14%, var(--line));
+      border-radius: 24px;
+    }
+
+    #reply-prototype .hero::before,
+    #reply-prototype .hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      pointer-events: none;
+    }
+
+    #reply-prototype .hero::before {
+      top: -25px;
+      right: -11px;
+      width: 92px;
+      height: 92px;
+      border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+    }
+
+    #reply-prototype .hero::after {
+      right: 20px;
+      bottom: -39px;
+      width: 70px;
+      height: 70px;
+      background: color-mix(in srgb, var(--highlight) 15%, transparent);
+    }
+
+    #reply-prototype .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 7px;
+      color: var(--accent-ink);
+      font-size: 10.5px;
+      font-weight: 500;
+      letter-spacing: .3px;
+    }
+
+    #reply-prototype .hero-title {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      font-size: 24px;
+      font-weight: 500;
+      letter-spacing: -.5px;
+      line-height: 1.2;
+    }
+
+    #reply-prototype .hero-copy {
+      position: relative;
+      z-index: 1;
+      margin: 7px 0 0;
+      color: var(--ink-soft);
+      font-size: 11.5px;
+      line-height: 1.45;
+    }
+
+    #reply-prototype .hero-orbit {
+      position: absolute;
+      top: 21px;
+      right: 17px;
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      color: var(--accent-ink);
+      background: color-mix(in srgb, var(--surface) 70%, transparent);
+      border: 1px solid color-mix(in srgb, var(--accent) 12%, transparent);
+      border-radius: 50%;
+      box-shadow: 0 8px 20px color-mix(in srgb, var(--accent) 13%, transparent);
+    }
+
+    #reply-prototype .action-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    #reply-prototype .action-card {
+      position: relative;
+      display: flex;
+      min-height: 78px;
+      padding: 13px;
+      text-align: left;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+
+    #reply-prototype .action-card:active {
+      transform: scale(.985);
+    }
+
+    #reply-prototype .action-icon {
+      display: grid;
+      flex: 0 0 32px;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      margin-right: 9px;
+      color: var(--accent-ink);
+      background: var(--accent-soft);
+      border-radius: 11px;
+    }
+
+    #reply-prototype .action-card:nth-child(2) .action-icon {
+      color: light-dark(#a14e39, #ffc1ad);
+      background: var(--highlight-soft);
+    }
+
+    #reply-prototype .action-title {
+      display: block;
+      margin-top: 1px;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.25;
+    }
+
+    #reply-prototype .action-copy {
+      display: block;
+      margin-top: 4px;
+      color: var(--ink-soft);
+      font-size: 9.8px;
+      line-height: 1.35;
+    }
+
+    #reply-prototype .section-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 1px;
+    }
+
+    #reply-prototype .section-label strong {
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    #reply-prototype .section-label span {
+      color: var(--ink-soft);
+      font-size: 9.5px;
+    }
+
+    #reply-prototype .demo-card {
+      position: relative;
+      padding: 13px 13px 12px;
+      background: var(--bubble-other);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: 0 9px 24px color-mix(in srgb, var(--ink) 5%, transparent);
+    }
+
+    #reply-prototype .chat-source {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    #reply-prototype .avatar {
+      display: grid;
+      flex: 0 0 27px;
+      place-items: center;
+      width: 27px;
+      height: 27px;
+      color: light-dark(#664d2f, #f4d6a9);
+      font-size: 11px;
+      background: light-dark(#f0dfc3, #4a3d2d);
+      border-radius: 50%;
+    }
+
+    #reply-prototype .chat-source-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    #reply-prototype .chat-source-copy strong {
+      font-size: 10.5px;
+      font-weight: 500;
+    }
+
+    #reply-prototype .chat-source-copy span {
+      color: var(--ink-soft);
+      font-size: 8.8px;
+    }
+
+    #reply-prototype .source-tag {
+      margin-left: auto;
+      padding: 4px 7px;
+      color: var(--ink-soft);
+      font-size: 8.5px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+    }
+
+    #reply-prototype .bubble {
+      width: fit-content;
+      max-width: 83%;
+      padding: 8px 10px;
+      font-size: 11px;
+      line-height: 1.45;
+      border-radius: 5px 13px 13px 13px;
+    }
+
+    #reply-prototype .bubble.other {
+      color: var(--ink);
+      background: var(--surface-2);
+    }
+
+    #reply-prototype .bubble.me {
+      margin-left: auto;
+      color: var(--ink);
+      background: var(--bubble-me);
+      border-radius: 13px 5px 13px 13px;
+    }
+
+    #reply-prototype .bubble + .bubble {
+      margin-top: 6px;
+    }
+
+    #reply-prototype .demo-cta {
+      display: flex;
+      width: 100%;
+      min-height: 34px;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 10px;
+      padding: 6px 12px;
+      color: light-dark(#fffaf2, #12231b);
+      font-size: 11.5px;
+      font-weight: 500;
+      background: var(--accent);
+      border: 0;
+      border-radius: 12px;
+    }
+
+    #reply-prototype .privacy-note {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 23px;
+      color: var(--ink-soft);
+      font-size: 9.2px;
+      text-align: center;
+    }
+
+    #reply-prototype .tabbar {
+      display: grid;
+      flex: 0 0 63px;
+      grid-template-columns: repeat(3, 1fr);
+      align-items: start;
+      padding: 8px 26px 4px;
+      background: var(--nav-bg);
+      border-top: 1px solid var(--line);
+      backdrop-filter: blur(16px);
+    }
+
+    #reply-prototype .tab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 2px;
+      color: var(--ink-soft);
+      font-size: 9px;
+      background: transparent;
+      border: 0;
+    }
+
+    #reply-prototype .tab.is-active {
+      color: var(--accent-ink);
+      font-weight: 500;
+    }
+
+    #reply-prototype .tab-dot {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 24px;
+      border-radius: 9px;
+    }
+
+    #reply-prototype .tab.is-active .tab-dot {
+      background: var(--accent-soft);
+    }
+
+    #reply-prototype .detail-bar {
+      display: flex;
+      flex: 0 0 57px;
+      align-items: center;
+      gap: 10px;
+      padding: 3px 16px 6px;
+      background: var(--surface);
+    }
+
+    #reply-prototype .back-button {
+      display: grid;
+      flex: 0 0 34px;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      color: var(--ink);
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 50%;
+    }
+
+    #reply-prototype .detail-title {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    #reply-prototype .detail-title strong {
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: -.15px;
+    }
+
+    #reply-prototype .detail-title span {
+      color: var(--ink-soft);
+      font-size: 9.5px;
+    }
+
+    #reply-prototype .analysis-body {
+      flex: 1;
+      min-height: 0;
+      padding: 2px 16px 14px;
+      overflow: auto;
+      scrollbar-width: none;
+    }
+
+    #reply-prototype .source-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 9px;
+      padding: 7px 9px;
+      color: var(--accent-ink);
+      font-size: 9.5px;
+      background: var(--accent-soft);
+      border: 1px solid color-mix(in srgb, var(--accent) 10%, var(--line));
+      border-radius: 10px;
+    }
+
+    #reply-prototype .source-row span {
+      color: var(--ink-soft);
+    }
+
+    #reply-prototype .relation-picker {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+      padding: 4px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    #reply-prototype .relation-chip {
+      min-height: 30px;
+      padding: 5px 7px;
+      color: var(--ink-soft);
+      font-size: 10.5px;
+      background: transparent;
+      border: 0;
+      border-radius: 9px;
+    }
+
+    #reply-prototype .relation-chip.is-active {
+      color: var(--ink);
+      font-weight: 500;
+      background: var(--surface);
+      box-shadow: var(--phone-shadow);
+    }
+
+    #reply-prototype .context-card {
+      margin-bottom: 10px;
+      padding: 10px 11px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+
+    #reply-prototype .context-head {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+      color: var(--ink-soft);
+      font-size: 9px;
+    }
+
+    #reply-prototype .context-head strong {
+      color: var(--ink);
+      font-size: 10.5px;
+      font-weight: 500;
+    }
+
+    #reply-prototype .conversation {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    #reply-prototype .mini-bubble {
+      width: fit-content;
+      max-width: 82%;
+      padding: 6px 8px;
+      font-size: 10.3px;
+      line-height: 1.4;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 4px 11px 11px 11px;
+    }
+
+    #reply-prototype .mini-bubble.me {
+      align-self: flex-end;
+      background: var(--bubble-me);
+      border-color: transparent;
+      border-radius: 11px 4px 11px 11px;
+    }
+
+    #reply-prototype .read-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 9px 0 7px;
+    }
+
+    #reply-prototype .read-row strong {
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    #reply-prototype .intent {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 7px;
+      color: var(--accent-ink);
+      font-size: 8.5px;
+      background: var(--accent-soft);
+      border-radius: 99px;
+    }
+
+    #reply-prototype .reply-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    #reply-prototype .reply-card {
+      position: relative;
+      padding: 11px 12px 10px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      box-shadow: 0 5px 14px color-mix(in srgb, var(--ink) 3%, transparent);
+    }
+
+    #reply-prototype .reply-card.is-selected {
+      border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 10%, transparent);
+    }
+
+    #reply-prototype .reply-top {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 5px;
+    }
+
+    #reply-prototype .style-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    #reply-prototype .reply-card:nth-child(2) .style-dot {
+      background: var(--highlight);
+    }
+
+    #reply-prototype .reply-card:nth-child(3) .style-dot {
+      background: var(--gold);
+    }
+
+    #reply-prototype .reply-style {
+      font-size: 10.5px;
+      font-weight: 500;
+    }
+
+    #reply-prototype .reply-fit {
+      margin-left: auto;
+      color: var(--ink-soft);
+      font-size: 8.5px;
+    }
+
+    #reply-prototype .reply-text {
+      margin: 0;
+      font-size: 12px;
+      line-height: 1.52;
+      letter-spacing: -.05px;
+    }
+
+    #reply-prototype .reply-why {
+      display: flex;
+      gap: 5px;
+      margin: 6px 0 8px;
+      color: var(--ink-soft);
+      font-size: 9.2px;
+      line-height: 1.4;
+    }
+
+    #reply-prototype .reply-actions {
+      display: flex;
+      gap: 7px;
+    }
+
+    #reply-prototype .reply-action {
+      display: inline-flex;
+      min-height: 28px;
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 5px 8px;
+      color: var(--ink);
+      font-size: 9.6px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 9px;
+    }
+
+    #reply-prototype .reply-action.primary {
+      color: light-dark(#fffaf2, #12231b);
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    #reply-prototype .analysis-footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 10px 0 2px;
+      color: var(--ink-soft);
+      font-size: 8.8px;
+    }
+
+    #reply-prototype .keyboard-screen {
+      background: var(--surface);
+    }
+
+    #reply-prototype .chat-appbar {
+      display: flex;
+      flex: 0 0 54px;
+      align-items: center;
+      gap: 10px;
+      padding: 0 16px 7px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    #reply-prototype .chat-app-title {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      align-items: center;
+      gap: 1px;
+    }
+
+    #reply-prototype .chat-app-title strong {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    #reply-prototype .chat-app-title span {
+      color: var(--ink-soft);
+      font-size: 8.5px;
+    }
+
+    #reply-prototype .chat-body {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
+      padding: 18px 14px 10px;
+      background:
+        linear-gradient(color-mix(in srgb, var(--paper) 74%, transparent), color-mix(in srgb, var(--paper) 74%, transparent)),
+        radial-gradient(circle at 20% 30%, var(--accent-soft) 0 2px, transparent 3px) 0 0 / 22px 22px;
+    }
+
+    #reply-prototype .chat-time {
+      align-self: center;
+      padding: 3px 7px;
+      color: var(--ink-soft);
+      font-size: 8px;
+      background: color-mix(in srgb, var(--surface) 75%, transparent);
+      border-radius: 99px;
+    }
+
+    #reply-prototype .large-bubble {
+      width: fit-content;
+      max-width: 76%;
+      padding: 9px 11px;
+      font-size: 11.3px;
+      line-height: 1.5;
+      background: var(--bubble-other);
+      border: 1px solid var(--line);
+      border-radius: 5px 14px 14px 14px;
+    }
+
+    #reply-prototype .large-bubble.me {
+      align-self: flex-end;
+      background: var(--bubble-me);
+      border-color: transparent;
+      border-radius: 14px 5px 14px 14px;
+    }
+
+    #reply-prototype .typing-note {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: auto;
+      color: var(--accent-ink);
+      font-size: 8.8px;
+    }
+
+    #reply-prototype .input-row {
+      display: flex;
+      flex: 0 0 54px;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 12px;
+      background: var(--surface-2);
+      border-top: 1px solid var(--line);
+    }
+
+    #reply-prototype .message-input {
+      width: 100%;
+      min-height: 38px;
+      max-height: 38px;
+      flex: 1;
+      padding: 10px 12px;
+      color: var(--ink);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      outline: none;
+      resize: none;
+    }
+
+    #reply-prototype .send-button {
+      display: grid;
+      flex: 0 0 34px;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      color: light-dark(#fffaf2, #12231b);
+      background: var(--accent);
+      border: 0;
+      border-radius: 50%;
+    }
+
+    #reply-prototype .keyboard-panel {
+      flex: 0 0 278px;
+      padding: 9px 12px 8px;
+      background: light-dark(#e9e5dc, #1b1f1c);
+      border-top: 1px solid var(--line);
+    }
+
+    #reply-prototype .keyboard-brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 7px;
+    }
+
+    #reply-prototype .keyboard-brand {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--accent-ink);
+      font-size: 9.5px;
+      font-weight: 500;
+    }
+
+    #reply-prototype .keyboard-tools {
+      display: flex;
+      gap: 6px;
+    }
+
+    #reply-prototype .keyboard-tool {
+      display: inline-flex;
+      min-height: 28px;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 7px;
+      color: var(--ink-soft);
+      font-size: 8.5px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    #reply-prototype .suggestion-strip {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    #reply-prototype .suggestion-strip::-webkit-scrollbar {
+      display: none;
+    }
+
+    #reply-prototype .suggestion-pill {
+      min-width: 0;
+      flex: 1 0 31%;
+      padding: 8px;
+      text-align: left;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+
+    #reply-prototype .suggestion-pill.is-active {
+      background: var(--accent-soft);
+      border-color: color-mix(in srgb, var(--accent) 50%, var(--line));
+    }
+
+    #reply-prototype .suggestion-pill strong {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--accent-ink);
+      font-size: 8px;
+      font-weight: 500;
+    }
+
+    #reply-prototype .suggestion-pill span {
+      display: -webkit-box;
+      overflow: hidden;
+      color: var(--ink);
+      font-size: 9px;
+      line-height: 1.35;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+
+    #reply-prototype .key-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 7px;
+    }
+
+    #reply-prototype .key {
+      display: grid;
+      flex: 1;
+      min-width: 0;
+      height: 38px;
+      place-items: center;
+      padding: 0 5px;
+      color: var(--ink);
+      font-size: 13px;
+      background: var(--surface);
+      border: 0;
+      border-radius: 7px;
+      box-shadow: var(--phone-shadow);
+    }
+
+    #reply-prototype .key.wide {
+      flex: 1.5;
+    }
+
+    #reply-prototype .key.utility {
+      color: var(--ink-soft);
+      font-size: 9px;
+      background: color-mix(in srgb, var(--surface) 68%, var(--line));
+    }
+
+    #reply-prototype .key.globe {
+      flex: 0 0 42px;
+    }
+
+    #reply-prototype .key.return-key {
+      flex: 0 0 64px;
+      color: light-dark(#fffaf2, #12231b);
+      background: var(--accent);
+    }
+
+    #reply-prototype .keyboard-home-indicator {
+      width: 118px;
+      height: 4px;
+      margin: 8px auto 0;
+      background: var(--ink);
+      border-radius: 99px;
+      opacity: .75;
+    }
+
+    #reply-prototype .simple-page {
+      flex: 1;
+      min-height: 0;
+      padding: 7px 18px 18px;
+      overflow: auto;
+      scrollbar-width: none;
+    }
+
+    #reply-prototype .simple-page::-webkit-scrollbar {
+      display: none;
+    }
+
+    #reply-prototype .page-heading {
+      margin: 4px 0 16px;
+      font-size: 26px;
+      font-weight: 500;
+      letter-spacing: -.7px;
+    }
+
+    #reply-prototype .page-heading span {
+      display: block;
+      margin-top: 5px;
+      color: var(--ink-soft);
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0;
+    }
+
+    #reply-prototype .history-list,
+    #reply-prototype .setting-list {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    #reply-prototype .history-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      width: 100%;
+      padding: 13px;
+      text-align: left;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+
+    #reply-prototype .history-avatar {
+      display: grid;
+      flex: 0 0 38px;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      color: var(--accent-ink);
+      font-size: 13px;
+      background: var(--accent-soft);
+      border-radius: 14px;
+    }
+
+    #reply-prototype .history-copy {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    #reply-prototype .history-copy strong {
+      font-size: 11.5px;
+      font-weight: 500;
+    }
+
+    #reply-prototype .history-copy span {
+      overflow: hidden;
+      color: var(--ink-soft);
+      font-size: 9.5px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    #reply-prototype .settings-hero {
+      padding: 16px;
+      margin-bottom: 11px;
+      background: linear-gradient(125deg, var(--accent-soft), var(--highlight-soft));
+      border: 1px solid color-mix(in srgb, var(--accent) 12%, var(--line));
+      border-radius: 20px;
+    }
+
+    #reply-prototype .settings-hero strong {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    #reply-prototype .settings-hero span {
+      display: block;
+      margin-top: 5px;
+      color: var(--ink-soft);
+      font-size: 10px;
+      line-height: 1.45;
+    }
+
+    #reply-prototype .setting-group-label {
+      margin: 11px 3px 6px;
+      color: var(--ink-soft);
+      font-size: 9px;
+    }
+
+    #reply-prototype .setting-item {
+      display: flex;
+      min-height: 47px;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+    }
+
+    #reply-prototype .setting-icon {
+      display: grid;
+      flex: 0 0 29px;
+      place-items: center;
+      width: 29px;
+      height: 29px;
+      color: var(--accent-ink);
+      background: var(--accent-soft);
+      border-radius: 9px;
+    }
+
+    #reply-prototype .setting-copy {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    #reply-prototype .setting-copy strong {
+      font-size: 10.5px;
+      font-weight: 500;
+    }
+
+    #reply-prototype .setting-copy span {
+      color: var(--ink-soft);
+      font-size: 8.8px;
+    }
+
+    #reply-prototype .switch {
+      position: relative;
+      flex: 0 0 34px;
+      width: 34px;
+      height: 20px;
+      padding: 0;
+      background: var(--line);
+      border: 0;
+      border-radius: 99px;
+      transition: background .18s ease;
+    }
+
+    #reply-prototype .switch::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 14px;
+      height: 14px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
+      transition: transform .18s ease;
+    }
+
+    #reply-prototype .switch.is-on {
+      background: var(--accent);
+    }
+
+    #reply-prototype .switch.is-on::after {
+      transform: translateX(14px);
+    }
+
+    #reply-prototype .setting-link {
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    #reply-prototype .setting-link:active {
+      transform: scale(.99);
+    }
+
+    #reply-prototype .field-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+
+    #reply-prototype .field-label {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      color: var(--ink-soft);
+      font-size: 9.5px;
+    }
+
+    #reply-prototype .field-label strong {
+      color: var(--ink);
+      font-size: 10.5px;
+      font-weight: 500;
+    }
+
+    #reply-prototype .field-input,
+    #reply-prototype .field-select,
+    #reply-prototype .field-textarea {
+      width: 100%;
+      padding: 9px 10px;
+      color: var(--ink);
+      font-size: 16px;
+      line-height: 1.35;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      outline: none;
+    }
+
+    #reply-prototype .field-textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
+
+    #reply-prototype .field-select {
+      appearance: none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, var(--ink-soft) 50%),
+        linear-gradient(135deg, var(--ink-soft) 50%, transparent 50%);
+      background-position:
+        calc(100% - 14px) 17px,
+        calc(100% - 9px) 17px;
+      background-repeat: no-repeat;
+      background-size: 5px 5px;
+    }
+
+    #reply-prototype .field-help {
+      color: var(--ink-soft);
+      font-size: 8.8px;
+      line-height: 1.45;
+    }
+
+    #reply-prototype .form-card {
+      padding: 13px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 17px;
+    }
+
+    #reply-prototype .form-card + .form-card {
+      margin-top: 10px;
+    }
+
+    #reply-prototype .form-card-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    #reply-prototype .form-actions {
+      display: flex;
+      gap: 7px;
+      margin-top: 12px;
+    }
+
+    #reply-prototype .save-primary,
+    #reply-prototype .test-secondary {
+      display: inline-flex;
+      min-height: 39px;
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 7px 10px;
+      font-size: 10.5px;
+      border-radius: 11px;
+    }
+
+    #reply-prototype .save-primary {
+      color: light-dark(#fffaf2, #12231b);
+      background: var(--accent);
+      border: 1px solid var(--accent);
+    }
+
+    #reply-prototype .test-secondary {
+      color: var(--ink);
+      background: var(--surface);
+      border: 1px solid var(--line);
+    }
+
+    #reply-prototype .api-status {
+      min-height: 30px;
+      margin-top: 9px;
+      padding: 8px 10px;
+      color: var(--ink-soft);
+      font-size: 9px;
+      line-height: 1.45;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+
+    #reply-prototype .api-status.is-error {
+      color: light-dark(#9f3f37, #ffb6ae);
+      background: light-dark(#fae8e4, #3b2623);
+      border-color: light-dark(#eabeb7, #6b3a34);
+    }
+
+    #reply-prototype .api-status.is-ok {
+      color: var(--accent-ink);
+      background: var(--accent-soft);
+      border-color: color-mix(in srgb, var(--accent) 24%, var(--line));
+    }
+
+    #reply-prototype .connection-summary {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 7px;
+      color: var(--ink-soft);
+      font-size: 8px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 99px;
+    }
+
+    #reply-prototype .connection-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--ink-soft);
+      border-radius: 50%;
+      opacity: .55;
+    }
+
+    #reply-prototype .connection-summary.is-connected .connection-dot {
+      background: #55a977;
+      opacity: 1;
+    }
+
+    #reply-prototype .sim-loading-card {
+      min-height: 126px;
+      padding: 18px 14px;
+      color: var(--ink-soft);
+      font-size: 10px;
+      line-height: 1.55;
+      text-align: center;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 13px;
+    }
+
+    #reply-prototype .sim-loading-card strong {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    #reply-prototype .natural-badge {
+      border: 0;
+      cursor: pointer;
+    }
+
+    #reply-prototype .contact-role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 7px;
+      color: var(--accent-ink);
+      font-size: 8.5px;
+      background: var(--accent-soft);
+      border-radius: 99px;
+    }
+
+    #reply-prototype .toast {
+      position: absolute;
+      right: 18px;
+      bottom: 82px;
+      left: 18px;
+      z-index: 30;
+      padding: 10px 12px;
+      color: var(--ink);
+      font-size: 10px;
+      text-align: center;
+      background: color-mix(in srgb, var(--surface) 92%, transparent);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, .14);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(5px);
+      transition: opacity .18s ease, transform .18s ease;
+      backdrop-filter: blur(12px);
+    }
+
+    #reply-prototype .toast.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #reply-prototype .loading-screen {
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      text-align: center;
+      background:
+        radial-gradient(circle at 50% 36%, var(--accent-soft), transparent 40%),
+        var(--surface);
+    }
+
+    #reply-prototype .loading-mark {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 70px;
+      height: 70px;
+      margin-bottom: 17px;
+      color: var(--accent-ink);
+      font-size: 25px;
+      background: var(--accent-soft);
+      border-radius: 24px 24px 24px 8px;
+    }
+
+    #reply-prototype .loading-mark::after {
+      content: "";
+      position: absolute;
+      inset: -8px;
+      border: 1px solid color-mix(in srgb, var(--accent) 26%, transparent);
+      border-radius: 30px 30px 30px 10px;
+      animation: reply-breathe 1.3s ease-in-out infinite;
+    }
+
+    @keyframes reply-breathe {
+      50% { transform: scale(1.04); opacity: .55; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #reply-prototype .loading-mark::after { animation: none; }
+    }
+
+    #reply-prototype .loading-screen strong {
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    #reply-prototype .loading-screen span {
+      margin-top: 6px;
+      color: var(--ink-soft);
+      font-size: 10px;
+    }
+
+    #reply-prototype .home-indicator {
+      position: absolute;
+      bottom: 5px;
+      left: 50%;
+      z-index: 24;
+      width: 120px;
+      height: 4px;
+      background: light-dark(#202020, #eee);
+      border-radius: 99px;
+      transform: translateX(-50%);
+      opacity: .8;
+      pointer-events: none;
+    }
+
+    #reply-prototype .simulate-entry {
+      display: flex;
+      flex: 0 0 61px;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 10px 12px;
+      text-align: left;
+      background:
+        linear-gradient(112deg, var(--accent-soft), color-mix(in srgb, var(--highlight-soft) 70%, var(--surface)));
+      border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--line));
+      border-radius: 18px;
+    }
+
+    #reply-prototype .simulate-avatars {
+      position: relative;
+      flex: 0 0 43px;
+      width: 43px;
+      height: 34px;
+    }
+
+    #reply-prototype .simulate-avatar {
+      position: absolute;
+      top: 2px;
+      display: grid;
+      width: 31px;
+      height: 31px;
+      place-items: center;
+      color: var(--accent-ink);
+      font-size: 11px;
+      background: var(--surface);
+      border: 2px solid var(--accent-soft);
+      border-radius: 50%;
+    }
+
+    #reply-prototype .simulate-avatar:first-child {
+      right: 0;
+      color: light-dark(#8d553f, #ffc5b2);
+      border-color: var(--highlight-soft);
+    }
+
+    #reply-prototype .simulate-avatar:last-child {
+      left: 0;
+    }
+
+    #reply-prototype .simulate-entry-copy {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    #reply-prototype .simulate-entry-copy strong {
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    #reply-prototype .simulate-entry-copy span {
+      overflow: hidden;
+      color: var(--ink-soft);
+      font-size: 9.3px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    #reply-prototype .simulate-entry-end {
+      display: flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: 5px;
+      color: var(--accent-ink);
+      font-size: 9px;
+      font-weight: 500;
+    }
+
+    #reply-prototype .sim-header {
+      display: flex;
+      flex: 0 0 56px;
+      align-items: center;
+      gap: 9px;
+      padding: 2px 15px 5px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+    }
+
+    #reply-prototype .sim-avatar-large {
+      position: relative;
+      display: grid;
+      flex: 0 0 35px;
+      width: 35px;
+      height: 35px;
+      place-items: center;
+      color: var(--accent-ink);
+      font-size: 12px;
+      background: var(--accent-soft);
+      border-radius: 50%;
+    }
+
+    #reply-prototype .sim-avatar-large::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      bottom: 1px;
+      width: 8px;
+      height: 8px;
+      background: #52a978;
+      border: 2px solid var(--surface);
+      border-radius: 50%;
+    }
+
+    #reply-prototype .sim-heading {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    #reply-prototype .sim-heading strong {
+      overflow: hidden;
+      font-size: 13px;
+      font-weight: 500;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    #reply-prototype .sim-heading span {
+      color: var(--ink-soft);
+      font-size: 8.8px;
+    }
+
+    #reply-prototype .mode-scroller {
+      display: flex;
+      flex: 0 0 41px;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px 6px;
+      overflow-x: auto;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      scrollbar-width: none;
+    }
+
+    #reply-prototype .mode-scroller::-webkit-scrollbar {
+      display: none;
+    }
+
+    #reply-prototype .mode-chip {
+      flex: 0 0 auto;
+      min-height: 28px;
+      padding: 5px 10px;
+      color: var(--ink-soft);
+      font-size: 9.7px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+    }
+
+    #reply-prototype .mode-chip.is-active {
+      color: light-dark(#fffaf2, #12231b);
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    #reply-prototype .sim-context-row {
+      display: flex;
+      flex: 0 0 28px;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 14px;
+      color: var(--ink-soft);
+      font-size: 8.8px;
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--line);
+    }
+
+    #reply-prototype .context-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 3px 6px;
+      color: var(--accent-ink);
+      background: var(--accent-soft);
+      border-radius: 99px;
+    }
+
+    #reply-prototype .sim-thread {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
+      padding: 11px 13px 8px;
+      overflow: auto;
+      background:
+        linear-gradient(color-mix(in srgb, var(--paper) 76%, transparent), color-mix(in srgb, var(--paper) 76%, transparent)),
+        radial-gradient(circle at 20% 30%, var(--accent-soft) 0 2px, transparent 3px) 0 0 / 23px 23px;
+      scrollbar-width: none;
+    }
+
+    #reply-prototype .sim-thread::-webkit-scrollbar {
+      display: none;
+    }
+
+    #reply-prototype .thread-time {
+      align-self: center;
+      padding: 2px 7px;
+      color: var(--ink-soft);
+      font-size: 8px;
+      background: color-mix(in srgb, var(--surface) 78%, transparent);
+      border-radius: 99px;
+    }
+
+    #reply-prototype .thread-message {
+      display: flex;
+      max-width: 91%;
+      align-items: flex-end;
+      gap: 6px;
+    }
+
+    #reply-prototype .thread-message.me {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    #reply-prototype .thread-avatar {
+      display: grid;
+      flex: 0 0 23px;
+      width: 23px;
+      height: 23px;
+      place-items: center;
+      color: light-dark(#755a3a, #f0d4af);
+      font-size: 8.5px;
+      background: light-dark(#f0dfc3, #4a3d2d);
+      border-radius: 50%;
+    }
+
+    #reply-prototype .thread-message.me .thread-avatar {
+      color: var(--accent-ink);
+      background: var(--accent-soft);
+    }
+
+    #reply-prototype .thread-bubble {
+      padding: 7px 9px;
+      color: var(--ink);
+      font-size: 10.2px;
+      line-height: 1.45;
+      background: var(--bubble-other);
+      border: 1px solid var(--line);
+      border-radius: 4px 12px 12px 12px;
+    }
+
+    #reply-prototype .thread-message.me .thread-bubble {
+      background: var(--bubble-me);
+      border-color: transparent;
+      border-radius: 12px 4px 12px 12px;
+    }
+
+    #reply-prototype .thread-bubble small {
+      display: block;
+      margin-top: 3px;
+      color: var(--ink-soft);
+      font-size: 7.8px;
+    }
+
+    #reply-prototype .thread-insight {
+      align-self: center;
+      max-width: 92%;
+      padding: 4px 8px;
+      color: var(--accent-ink);
+      font-size: 8.4px;
+      text-align: center;
+      background: var(--accent-soft);
+      border-radius: 99px;
+    }
+
+    #reply-prototype .reply-dock {
+      flex: 0 0 182px;
+      padding: 7px 11px 7px;
+      background: var(--surface);
+      border-top: 1px solid var(--line);
+    }
+
+    #reply-prototype .reply-dock-head {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 5px;
+    }
+
+    #reply-prototype .reply-dock-head strong {
+      font-size: 10.5px;
+      font-weight: 500;
+    }
+
+    #reply-prototype .reply-angle {
+      min-width: 0;
+      flex: 1;
+      overflow: hidden;
+      color: var(--ink-soft);
+      font-size: 8.3px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    #reply-prototype .natural-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 3px 6px;
+      color: var(--accent-ink);
+      font-size: 7.8px;
+      background: var(--accent-soft);
+      border-radius: 99px;
+    }
+
+    #reply-prototype .sim-reply-list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    #reply-prototype .sim-reply-card {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 7px;
+      align-items: center;
+      min-height: 43px;
+      padding: 6px 7px 6px 9px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 11px;
+    }
+
+    #reply-prototype .sim-reply-card.is-selected {
+      background: color-mix(in srgb, var(--accent-soft) 64%, var(--surface));
+      border-color: color-mix(in srgb, var(--accent) 48%, var(--line));
+    }
+
+    #reply-prototype .sim-reply-content {
+      min-width: 0;
+    }
+
+    #reply-prototype .sim-reply-content p {
+      display: -webkit-box;
+      margin: 0;
+      overflow: hidden;
+      font-size: 9.7px;
+      line-height: 1.38;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+
+    #reply-prototype .sim-reply-content span {
+      display: block;
+      margin-top: 2px;
+      overflow: hidden;
+      color: var(--ink-soft);
+      font-size: 7.8px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    #reply-prototype .sim-reply-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    #reply-prototype .sim-mini-action {
+      min-height: 21px;
+      padding: 3px 6px;
+      color: var(--ink-soft);
+      font-size: 7.8px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 7px;
+    }
+
+    #reply-prototype .sim-mini-action.primary {
+      color: light-dark(#fffaf2, #12231b);
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    #reply-prototype .composer-panel {
+      flex: 0 0 94px;
+      padding: 6px 11px 8px;
+      background: var(--surface);
+      border-top: 1px solid var(--line);
+    }
+
+    #reply-prototype .compose-switch {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 5px;
+      padding: 2px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 9px;
+    }
+
+    #reply-prototype .compose-kind {
+      flex: 1;
+      min-height: 24px;
+      padding: 3px 6px;
+      color: var(--ink-soft);
+      font-size: 8.8px;
+      background: transparent;
+      border: 0;
+      border-radius: 7px;
+    }
+
+    #reply-prototype .compose-kind.is-active {
+      color: var(--ink);
+      font-weight: 500;
+      background: var(--surface);
+      box-shadow: var(--phone-shadow);
+    }
+
+    #reply-prototype .compose-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    #reply-prototype .compose-input {
+      width: 100%;
+      min-height: 40px;
+      max-height: 40px;
+      flex: 1;
+      padding: 8px 10px;
+      color: var(--ink);
+      font-size: 10px;
+      line-height: 1.35;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      outline: none;
+      resize: none;
+    }
+
+    #reply-prototype .compose-submit {
+      display: grid;
+      flex: 0 0 38px;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      color: light-dark(#fffaf2, #12231b);
+      background: var(--accent);
+      border: 0;
+      border-radius: 11px;
+    }
+
+    #reply-prototype .stage-caption {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 7px 12px;
+      margin-top: 12px;
+      color: var(--ink-soft);
+      font-size: 10px;
+      text-align: center;
+    }
+
+    #reply-prototype .stage-caption span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    #reply-prototype .stage-caption i {
+      width: 5px;
+      height: 5px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    @media (max-width: 340px) {
+      #reply-prototype .proto-stage {
+        padding: 8px 0;
+        border-radius: 20px;
+      }
+
+      #reply-prototype .home-body {
+        padding-right: 13px;
+        padding-left: 13px;
+      }
+
+      #reply-prototype .hero-title {
+        font-size: 21px;
+      }
+
+      #reply-prototype .hero-orbit {
+        right: 12px;
+        width: 38px;
+        height: 38px;
+      }
+    }
+
+    @media (max-width: 500px) {
+      #reply-prototype .proto-stage {
+        display: block;
+        padding: 0;
+        background: var(--surface);
+        border-radius: 0;
+      }
+
+      #reply-prototype .phone {
+        width: 100%;
+        height: 100dvh;
+        aspect-ratio: auto;
+        padding: 0;
+        background: var(--surface);
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      #reply-prototype .phone::after {
+        display: none;
+      }
+
+      #reply-prototype .phone-screen {
+        height: 100dvh;
+        border-radius: 0;
+      }
+
+      #reply-prototype .stage-caption {
+        display: none;
+      }
+
+      #reply-prototype .compose-input,
+      #reply-prototype .message-input {
+        font-size: 16px;
+      }
+    }
+
+    @media (display-mode: standalone) {
+      #reply-prototype .statusbar,
+      #reply-prototype .home-indicator {
+        display: none;
+      }
+
+      #reply-prototype .phone-screen {
+        padding-top: env(safe-area-inset-top);
+      }
+
+      #reply-prototype .composer-panel,
+      #reply-prototype .tabbar {
+        padding-bottom: max(8px, env(safe-area-inset-bottom));
+      }
+    }
+  </style>
+
+  <div class="proto-stage">
+    <div class="phone" aria-label="小马沟通助手">
+      <div class="phone-screen">
+        <div class="statusbar" aria-hidden="true">
+          <span>9:41</span>
+          <div class="status-icons">
+            <span class="signal"><i></i><i></i><i></i><i></i></span>
+            <span style="font-size:9px;font-weight:500">5G</span>
+            <span class="battery"></span>
+          </div>
+        </div>
+
+        <div class="screens">
+          <section class="screen is-active" id="screen-simulator" aria-label="沟通演练">
+            <header class="sim-header">
+              <button class="back-button" type="button" data-go="home" aria-label="返回首页">
+                <i data-lucide="chevron-left" aria-hidden="true"></i>
+              </button>
+              <div class="sim-avatar-large" id="sim-contact-avatar" aria-hidden="true">澄</div>
+              <div class="sim-heading">
+                <strong id="sim-contact-heading">和阿澄的沟通演练</strong>
+                <span id="sim-context-count">已记住 3 条沟通内容 · 上下文会持续保留</span>
+              </div>
+              <button class="icon-button" type="button" data-go="contact" aria-label="对方档案">
+                <i data-lucide="settings-2" aria-hidden="true"></i>
+              </button>
+            </header>
+
+            <div class="mode-scroller" role="group" aria-label="选择回复模式">
+              <button class="mode-chip is-active" type="button" data-mode="高情商">高情商</button>
+              <button class="mode-chip" type="button" data-mode="暖男">暖男</button>
+              <button class="mode-chip" type="button" data-mode="温柔坚定">温柔坚定</button>
+              <button class="mode-chip" type="button" data-mode="松弛幽默">松弛幽默</button>
+              <button class="mode-chip" type="button" data-mode="职场稳妥">职场稳妥</button>
+              <button class="mode-chip" type="button" data-mode="真诚直接">真诚直接</button>
+            </div>
+
+            <div class="sim-context-row">
+              <span class="context-pill" id="sim-contact-pill">
+                <i data-lucide="heart" width="9" height="9" aria-hidden="true"></i>
+                <span id="sim-contact-relation">喜欢的人</span>
+              </span>
+              <span class="context-pill" id="sim-angle-pill">
+                <i data-lucide="compass" width="9" height="9" aria-hidden="true"></i>
+                先接住情绪
+              </span>
+              <span>不虚构你们的关系</span>
+            </div>
+
+            <div class="sim-thread" id="sim-thread" aria-live="polite"></div>
+
+            <section class="reply-dock" aria-label="回复建议">
+              <div class="reply-dock-head">
+                <strong id="sim-mode-title">高情商建议</strong>
+                <span class="reply-angle" id="sim-mode-angle">先接住情绪，再回应关系，不急着讲道理</span>
+                <button class="natural-badge" type="button" id="sim-regenerate">
+                  <i data-lucide="refresh-cw" width="9" height="9" aria-hidden="true"></i>
+                  <span id="sim-ai-source">本地演示</span>
+                </button>
+              </div>
+              <div class="sim-reply-list" id="sim-reply-list"></div>
+            </section>
+
+            <div class="composer-panel">
+              <div class="compose-switch" role="group" aria-label="选择要录入的消息">
+                <button class="compose-kind" type="button" data-compose-kind="them">TA 发来的</button>
+                <button class="compose-kind is-active" type="button" data-compose-kind="me">我刚发的</button>
+              </div>
+              <div class="compose-row">
+                <textarea class="compose-input" id="sim-input" rows="1" aria-label="粘贴聊天内容" placeholder="记录你实际发出的回复…"></textarea>
+                <button class="compose-submit" type="button" id="sim-submit" aria-label="发送到沟通演练">
+                  <i data-lucide="arrow-up" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section class="screen" id="screen-home" aria-label="首页">
+            <header class="appbar">
+              <div class="brand">
+                <div class="brand-mark" aria-hidden="true">马</div>
+                <div class="brand-copy">
+                  <span class="brand-name">小马</span>
+                  <span class="brand-sub">先懂言外之意，再说得体的话</span>
+                </div>
+              </div>
+              <button class="icon-button" type="button" data-go="settings" aria-label="设置">
+                <i data-lucide="sliders-horizontal" aria-hidden="true"></i>
+              </button>
+            </header>
+
+            <div class="home-body">
+              <section class="hero">
+                <div class="eyebrow">
+                  <i data-lucide="sparkles" width="12" height="12" aria-hidden="true"></i>
+                  今天也可以好好说话
+                </div>
+                <h2 class="hero-title">这句话，怎么回？</h2>
+                <p class="hero-copy">看懂情绪与关系，给你三种不回错的选择。</p>
+                <div class="hero-orbit" aria-hidden="true">
+                  <i data-lucide="message-circle-heart" width="21" height="21"></i>
+                </div>
+              </section>
+
+              <button class="simulate-entry" type="button" data-go="simulator">
+                <span class="simulate-avatars" aria-hidden="true">
+                  <span class="simulate-avatar">我</span>
+                  <span class="simulate-avatar">澄</span>
+                </span>
+                <span class="simulate-entry-copy">
+                  <strong>继续和阿澄的沟通演练</strong>
+                  <span>接着聊，不用每次重复前因后果</span>
+                </span>
+                <span class="simulate-entry-end">
+                  高情商
+                  <i data-lucide="chevron-right" width="13" height="13" aria-hidden="true"></i>
+                </span>
+              </button>
+
+              <div class="action-grid">
+                <button class="action-card" type="button" data-analyze="screenshot">
+                  <span class="action-icon" aria-hidden="true">
+                    <i data-lucide="scan-text"></i>
+                  </span>
+                  <span>
+                    <span class="action-title">截图分析</span>
+                    <span class="action-copy">识别上传的聊天记录</span>
+                  </span>
+                </button>
+                <button class="action-card" type="button" data-analyze="clipboard">
+                  <span class="action-icon" aria-hidden="true">
+                    <i data-lucide="clipboard-paste"></i>
+                  </span>
+                  <span>
+                    <span class="action-title">复制分析</span>
+                    <span class="action-copy">读取刚复制的那句话</span>
+                  </span>
+                </button>
+              </div>
+
+              <div class="section-label">
+                <strong>试试看</strong>
+                <span>示例消息 · 不含真实聊天</span>
+              </div>
+
+              <article class="demo-card">
+                <div class="chat-source">
+                  <div class="avatar">周</div>
+                  <div class="chat-source-copy">
+                    <strong>周总</strong>
+                    <span>工作沟通 · 14:32</span>
+                  </div>
+                  <span class="source-tag">截图识别</span>
+                </div>
+                <div class="bubble other">今晚能把方案发我吗？明早开会要用。</div>
+                <div class="bubble me">还在补最后的预算数据。</div>
+                <button class="demo-cta" type="button" data-go="analysis">
+                  <i data-lucide="wand-sparkles" width="14" height="14" aria-hidden="true"></i>
+                  看看怎么回
+                </button>
+              </article>
+
+              <div class="privacy-note">
+                <i data-lucide="shield-check" width="12" height="12" aria-hidden="true"></i>
+                只在点击时分析，不保存聊天原文，不会自动发送
+              </div>
+            </div>
+
+            <nav class="tabbar" aria-label="主要导航">
+              <button class="tab is-active" type="button" data-go="home">
+                <span class="tab-dot"><i data-lucide="house" aria-hidden="true"></i></span>
+                首页
+              </button>
+              <button class="tab" type="button" data-go="history">
+                <span class="tab-dot"><i data-lucide="history" aria-hidden="true"></i></span>
+                记录
+              </button>
+              <button class="tab" type="button" data-go="settings">
+                <span class="tab-dot"><i data-lucide="user-round" aria-hidden="true"></i></span>
+                我的
+              </button>
+            </nav>
+          </section>
+
+          <section class="screen loading-screen" id="screen-loading" aria-label="分析中">
+            <div class="loading-mark" aria-hidden="true">马</div>
+            <strong>正在读懂这句话</strong>
+            <span id="loading-copy">识别消息、关系与情绪…</span>
+          </section>
+
+          <section class="screen" id="screen-analysis" aria-label="回复建议">
+            <header class="detail-bar">
+              <button class="back-button" type="button" data-go="home" aria-label="返回首页">
+                <i data-lucide="chevron-left" aria-hidden="true"></i>
+              </button>
+              <div class="detail-title">
+                <strong>看懂了，再回答</strong>
+                <span id="analysis-source">已从截图识别 2 条消息</span>
+              </div>
+              <button class="icon-button" type="button" id="retry-button" aria-label="重新分析">
+                <i data-lucide="refresh-cw" aria-hidden="true"></i>
+              </button>
+            </header>
+
+            <div class="analysis-body">
+              <div class="source-row">
+                <i data-lucide="scan-line" width="13" height="13" aria-hidden="true"></i>
+                <strong>识别完成</strong>
+                <span>已自动忽略时间与界面文字</span>
+              </div>
+
+              <div class="relation-picker" role="group" aria-label="选择对方关系">
+                <button class="relation-chip is-active" type="button" data-relation="领导">领导</button>
+                <button class="relation-chip" type="button" data-relation="客户">客户</button>
+                <button class="relation-chip" type="button" data-relation="朋友">朋友</button>
+              </div>
+
+              <div class="context-card">
+                <div class="context-head">
+                  <i data-lucide="messages-square" width="12" height="12" aria-hidden="true"></i>
+                  <strong id="context-name">周总</strong>
+                  <span>· 工作沟通</span>
+                </div>
+                <div class="conversation" id="analysis-conversation"></div>
+              </div>
+
+              <div class="read-row">
+                <strong>3 个回复方向</strong>
+                <span class="intent" id="intent-label">
+                  <i data-lucide="target" width="10" height="10" aria-hidden="true"></i>
+                  争取时间 · 稳住预期
+                </span>
+              </div>
+
+              <div class="reply-stack" id="reply-stack"></div>
+
+              <div class="analysis-footer">
+                <i data-lucide="lock-keyhole" width="10" height="10" aria-hidden="true"></i>
+                候选回复由 AI 生成，发送前请确认
+              </div>
+            </div>
+          </section>
+
+          <section class="screen keyboard-screen" id="screen-keyboard" aria-label="键盘插入预览">
+            <div class="chat-appbar">
+              <button class="back-button" type="button" data-go="analysis" aria-label="返回回复建议">
+                <i data-lucide="chevron-left" aria-hidden="true"></i>
+              </button>
+              <div class="chat-app-title">
+                <strong id="keyboard-chat-name">周总</strong>
+                <span>当前聊天 · 键盘已就绪</span>
+              </div>
+              <button class="icon-button" type="button" data-toast="原型中不会打开其他功能" aria-label="更多">
+                <i data-lucide="ellipsis" aria-hidden="true"></i>
+              </button>
+            </div>
+
+            <div class="chat-body">
+              <span class="chat-time">今天 14:32</span>
+              <div class="large-bubble" id="keyboard-prompt">今晚能把方案发我吗？明早开会要用。</div>
+              <div class="large-bubble me">还在补最后的预算数据。</div>
+              <div class="typing-note">
+                <i data-lucide="sparkles" width="11" height="11" aria-hidden="true"></i>
+                已懂你的意思，替你润色成更稳妥的说法
+              </div>
+            </div>
+
+            <div class="input-row">
+              <textarea class="message-input" id="message-input" rows="1" aria-label="聊天输入框">周总，我理解您明早要用。今晚我会先把框架和核心结论发您，完整数据明早 9 点前补齐，方便您先看重点。</textarea>
+              <button class="send-button" type="button" data-toast="原型中不会自动发送消息" aria-label="发送">
+                <i data-lucide="arrow-up" aria-hidden="true"></i>
+              </button>
+            </div>
+
+            <div class="keyboard-panel">
+              <div class="keyboard-brand-row">
+                <div class="keyboard-brand">
+                  <i data-lucide="message-circle-heart" width="12" height="12" aria-hidden="true"></i>
+                  小马键盘
+                </div>
+                <div class="keyboard-tools">
+                  <button class="keyboard-tool" type="button" data-go="analysis">
+                    <i data-lucide="scan-text" width="11" height="11" aria-hidden="true"></i>
+                    截图
+                  </button>
+                  <button class="keyboard-tool" type="button" data-toast="已模拟读取剪贴板">
+                    <i data-lucide="clipboard-paste" width="11" height="11" aria-hidden="true"></i>
+                    剪贴板
+                  </button>
+                </div>
+              </div>
+
+              <div class="suggestion-strip" id="keyboard-suggestions"></div>
+
+              <div class="key-row">
+                <button class="key" type="button" data-key="q">q</button>
+                <button class="key" type="button" data-key="w">w</button>
+                <button class="key" type="button" data-key="e">e</button>
+                <button class="key" type="button" data-key="r">r</button>
+                <button class="key" type="button" data-key="t">t</button>
+                <button class="key" type="button" data-key="y">y</button>
+                <button class="key" type="button" data-key="u">u</button>
+                <button class="key" type="button" data-key="i">i</button>
+                <button class="key" type="button" data-key="o">o</button>
+                <button class="key" type="button" data-key="p">p</button>
+              </div>
+              <div class="key-row">
+                <button class="key" type="button" data-key="a">a</button>
+                <button class="key" type="button" data-key="s">s</button>
+                <button class="key" type="button" data-key="d">d</button>
+                <button class="key" type="button" data-key="f">f</button>
+                <button class="key" type="button" data-key="g">g</button>
+                <button class="key" type="button" data-key="h">h</button>
+                <button class="key" type="button" data-key="j">j</button>
+                <button class="key" type="button" data-key="k">k</button>
+                <button class="key" type="button" data-key="l">l</button>
+              </div>
+              <div class="key-row">
+                <button class="key utility" type="button" data-shift>⇧</button>
+                <button class="key" type="button" data-key="z">z</button>
+                <button class="key" type="button" data-key="x">x</button>
+                <button class="key" type="button" data-key="c">c</button>
+                <button class="key" type="button" data-key="v">v</button>
+                <button class="key" type="button" data-key="b">b</button>
+                <button class="key" type="button" data-key="n">n</button>
+                <button class="key" type="button" data-key="m">m</button>
+                <button class="key utility" type="button" data-backspace>⌫</button>
+              </div>
+              <div class="key-row">
+                <button class="key utility globe" type="button" data-toast="原型中不切换系统键盘" aria-label="切换键盘">🌐</button>
+                <button class="key utility" type="button" data-toast="数字键盘未包含在原型中">123</button>
+                <button class="key wide" type="button" data-key=" ">空格</button>
+                <button class="key return-key" type="button" data-toast="原型中不会自动发送消息">发送</button>
+              </div>
+              <div class="keyboard-home-indicator" aria-hidden="true"></div>
+            </div>
+          </section>
+
+          <section class="screen" id="screen-history" aria-label="分析记录">
+            <header class="appbar">
+              <div class="brand">
+                <div class="brand-mark" aria-hidden="true">记</div>
+                <div class="brand-copy">
+                  <span class="brand-name">最近分析</span>
+                  <span class="brand-sub">原文默认不保存</span>
+                </div>
+              </div>
+              <button class="icon-button" type="button" data-toast="记录已是最新" aria-label="刷新">
+                <i data-lucide="refresh-cw" aria-hidden="true"></i>
+              </button>
+            </header>
+            <div class="simple-page">
+              <h2 class="page-heading">回过的难话<span>只保存在这台手机上，可随时清空</span></h2>
+              <div class="history-list">
+                <button class="history-item" type="button" data-open-history="领导">
+                  <span class="history-avatar">周</span>
+                  <span class="history-copy">
+                    <strong>周总 · 今晚能发方案吗</strong>
+                    <span>争取时间 · 生成了 3 条建议</span>
+                  </span>
+                  <i data-lucide="chevron-right" width="15" height="15" aria-hidden="true"></i>
+                </button>
+                <button class="history-item" type="button" data-open-history="客户">
+                  <span class="history-avatar">林</span>
+                  <span class="history-copy">
+                    <strong>林女士 · 为什么还没上线</strong>
+                    <span>安抚情绪 · 生成了 3 条建议</span>
+                  </span>
+                  <i data-lucide="chevron-right" width="15" height="15" aria-hidden="true"></i>
+                </button>
+                <button class="history-item" type="button" data-open-history="朋友">
+                  <span class="history-avatar">阿</span>
+                  <span class="history-copy">
+                    <strong>阿澄 · 你是不是不想理我</strong>
+                    <span>回应关系 · 生成了 3 条建议</span>
+                  </span>
+                  <i data-lucide="chevron-right" width="15" height="15" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+            <nav class="tabbar" aria-label="主要导航">
+              <button class="tab" type="button" data-go="home">
+                <span class="tab-dot"><i data-lucide="house" aria-hidden="true"></i></span>
+                首页
+              </button>
+              <button class="tab is-active" type="button" data-go="history">
+                <span class="tab-dot"><i data-lucide="history" aria-hidden="true"></i></span>
+                记录
+              </button>
+              <button class="tab" type="button" data-go="settings">
+                <span class="tab-dot"><i data-lucide="user-round" aria-hidden="true"></i></span>
+                我的
+              </button>
+            </nav>
+          </section>
+
+          <section class="screen" id="screen-settings" aria-label="我的设置">
+            <header class="appbar">
+              <div class="brand">
+                <div class="brand-mark" aria-hidden="true">我</div>
+                <div class="brand-copy">
+                  <span class="brand-name">我的风格</span>
+                  <span class="brand-sub">每次生成都会参考这些偏好</span>
+                </div>
+              </div>
+              <button class="icon-button" type="button" data-toast="配置已保存到本机" aria-label="保存">
+                <i data-lucide="check" aria-hidden="true"></i>
+              </button>
+            </header>
+            <div class="simple-page settings-body">
+              <h2 class="page-heading">让建议更像你<span>默认保留你的语气，而不是套话</span></h2>
+              <div class="settings-hero">
+                <strong>像你，但更得体</strong>
+                <span>短句、少寒暄，遇到不想答应的事会明确给出边界。AI 只给参考，不会替你发送。</span>
+              </div>
+              <div class="setting-group-label">AI 与人物</div>
+              <div class="setting-list">
+                <button class="setting-item setting-link" type="button" data-go="api">
+                  <span class="setting-icon"><i data-lucide="plug-zap" width="15" height="15" aria-hidden="true"></i></span>
+                  <span class="setting-copy">
+                    <strong>模型 API 与算力</strong>
+                    <span id="api-settings-summary">尚未配置模型</span>
+                  </span>
+                  <span class="connection-summary" id="api-connection-summary">
+                    <i class="connection-dot" aria-hidden="true"></i>
+                    <span id="api-connection-label">未连接</span>
+                  </span>
+                  <i data-lucide="chevron-right" width="14" height="14" aria-hidden="true"></i>
+                </button>
+                <button class="setting-item setting-link" type="button" data-go="contact">
+                  <span class="setting-icon"><i data-lucide="contact-round" width="15" height="15" aria-hidden="true"></i></span>
+                  <span class="setting-copy">
+                    <strong>对方人物档案</strong>
+                    <span id="contact-settings-summary">喜欢的人 · 未填写立场</span>
+                  </span>
+                  <i data-lucide="chevron-right" width="14" height="14" aria-hidden="true"></i>
+                </button>
+              </div>
+              <div class="setting-group-label">回复偏好</div>
+              <div class="setting-list">
+                <div class="setting-item">
+                  <span class="setting-icon"><i data-lucide="feather" width="15" height="15" aria-hidden="true"></i></span>
+                  <span class="setting-copy">
+                    <strong>少用客套话</strong>
+                    <span>避免“非常感谢您”等模板表达</span>
+                  </span>
+                  <button class="switch is-on" type="button" role="switch" aria-checked="true" aria-label="少用客套话"></button>
+                </div>
+                <div class="setting-item">
+                  <span class="setting-icon"><i data-lucide="smile" width="15" height="15" aria-hidden="true"></i></span>
+                  <span class="setting-copy">
+                    <strong>自然使用表情</strong>
+                    <span>亲近关系允许偶尔使用 1 个表情</span>
+                  </span>
+                  <button class="switch is-on" type="button" role="switch" aria-checked="true" aria-label="自然使用表情"></button>
+                </div>
+                <div class="setting-item">
+                  <span class="setting-icon"><i data-lucide="shield" width="15" height="15" aria-hidden="true"></i></span>
+                  <span class="setting-copy">
+                    <strong>敢于表达边界</strong>
+                    <span>不为了讨好而答应做不到的事</span>
+                  </span>
+                  <button class="switch is-on" type="button" role="switch" aria-checked="true" aria-label="敢于表达边界"></button>
+                </div>
+              </div>
+              <div class="setting-group-label">隐私</div>
+              <div class="setting-list">
+                <div class="setting-item">
+                  <span class="setting-icon"><i data-lucide="image-off" width="15" height="15" aria-hidden="true"></i></span>
+                  <span class="setting-copy">
+                    <strong>截图只在本地识别</strong>
+                    <span>上传的是 OCR 后的文字，不是原图</span>
+                  </span>
+                  <span style="color:var(--accent-ink);font-size:9px">已开启</span>
+                </div>
+                <div class="setting-item">
+                  <span class="setting-icon"><i data-lucide="trash-2" width="15" height="15" aria-hidden="true"></i></span>
+                  <span class="setting-copy">
+                    <strong>清空本地记录</strong>
+                    <span>不会影响聊天软件里的内容</span>
+                  </span>
+                  <button class="keyboard-tool" type="button" id="clear-conversation">清空</button>
+                </div>
+              </div>
+            </div>
+            <nav class="tabbar" aria-label="主要导航">
+              <button class="tab" type="button" data-go="home">
+                <span class="tab-dot"><i data-lucide="house" aria-hidden="true"></i></span>
+                首页
+              </button>
+              <button class="tab" type="button" data-go="history">
+                <span class="tab-dot"><i data-lucide="history" aria-hidden="true"></i></span>
+                记录
+              </button>
+              <button class="tab is-active" type="button" data-go="settings">
+                <span class="tab-dot"><i data-lucide="user-round" aria-hidden="true"></i></span>
+                我的
+              </button>
+            </nav>
+          </section>
+
+          <section class="screen" id="screen-contact" aria-label="对方人物档案">
+            <header class="appbar">
+              <button class="back-button" type="button" data-go="simulator" aria-label="返回沟通">
+                <i data-lucide="chevron-left" aria-hidden="true"></i>
+              </button>
+              <div class="brand-copy" style="min-width:0">
+                <span class="brand-name" style="font-size:17px">对方人物档案</span>
+                <span class="brand-sub">先判断他是谁、站在什么位置</span>
+              </div>
+            </header>
+            <div class="simple-page">
+              <h2 class="page-heading">先定义他是谁<span>人物关系会参与每一次整段对话分析</span></h2>
+              <div class="form-card">
+                <div class="form-card-title">
+                  <i data-lucide="user-round-cog" width="14" height="14" aria-hidden="true"></i>
+                  基本信息
+                </div>
+                <div class="field-stack">
+                  <label class="field-label" for="contact-name">
+                    <strong>对方称呼</strong>
+                    <input class="field-input" id="contact-name" type="text" autocomplete="off" placeholder="例如：阿澄">
+                  </label>
+                  <label class="field-label" for="contact-relation">
+                    <strong>与你的关系</strong>
+                    <select class="field-select" id="contact-relation">
+                      <option value="喜欢的人">喜欢的人</option>
+                      <option value="朋友">朋友</option>
+                      <option value="伴侣">伴侣</option>
+                      <option value="领导">领导</option>
+                      <option value="客户">客户</option>
+                      <option value="同事">同事</option>
+                      <option value="家人">家人</option>
+                      <option value="其他">其他</option>
+                    </select>
+                  </label>
+                  <label class="field-label" for="contact-personality">
+                    <strong>对方性格</strong>
+                    <textarea class="field-textarea" id="contact-personality" placeholder="例如：敏感、会反复确认关系，但不喜欢被敷衍"></textarea>
+                  </label>
+                </div>
+              </div>
+              <div class="form-card">
+                <div class="form-card-title">
+                  <i data-lucide="scale" width="14" height="14" aria-hidden="true"></i>
+                  当前立场与目标
+                </div>
+                <div class="field-stack">
+                  <label class="field-label" for="contact-stance">
+                    <strong>对方现在站在什么立场</strong>
+                    <textarea class="field-textarea" id="contact-stance" placeholder="例如：他觉得我最近在疏远他，正在试探我是否还在乎这段关系"></textarea>
+                  </label>
+                  <label class="field-label" for="contact-goal">
+                    <strong>我希望这次回复达到什么效果</strong>
+                    <textarea class="field-textarea" id="contact-goal" placeholder="例如：消除误会、给出确定感，但不要显得卑微或油腻"></textarea>
+                  </label>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button class="save-primary" type="button" id="save-contact">
+                  <i data-lucide="check" width="14" height="14" aria-hidden="true"></i>
+                  保存人物设定
+                </button>
+              </div>
+              <p class="field-help">档案只保存在这台手机的本地存储中。人物设定会与你转发和记录的全部聊天内容一起发送给你配置的模型。</p>
+            </div>
+          </section>
+
+          <section class="screen" id="screen-api" aria-label="API 设置">
+            <header class="appbar">
+              <button class="back-button" type="button" data-go="settings" aria-label="返回设置">
+                <i data-lucide="chevron-left" aria-hidden="true"></i>
+              </button>
+              <div class="brand-copy" style="min-width:0">
+                <span class="brand-name" style="font-size:17px">模型 API</span>
+                <span class="brand-sub">连接你的模型与算力</span>
+              </div>
+            </header>
+            <div class="simple-page">
+              <h2 class="page-heading">连接你的算力<span>支持 OpenAI 兼容接口和 Worker 中转</span></h2>
+              <div class="form-card">
+                <div class="form-card-title">
+                  <i data-lucide="cable" width="14" height="14" aria-hidden="true"></i>
+                  连接配置
+                </div>
+                <div class="field-stack">
+                  <label class="field-label" for="api-provider">
+                    <strong>服务商预设</strong>
+                    <select class="field-select" id="api-provider">
+                      <option value="deepseek">DeepSeek</option>
+                      <option value="qwen">通义千问</option>
+                      <option value="zhipu">智谱</option>
+                      <option value="openrouter">OpenRouter</option>
+                      <option value="custom">自定义</option>
+                    </select>
+                  </label>
+                  <label class="field-label" for="api-mode">
+                    <strong>连接方式</strong>
+                    <select class="field-select" id="api-mode">
+                      <option value="direct">网页直接连接 API</option>
+                      <option value="proxy">通过 Cloudflare Worker 中转</option>
+                    </select>
+                  </label>
+                  <label class="field-label" for="api-endpoint">
+                    <strong>API 完整地址</strong>
+                    <input class="field-input" id="api-endpoint" type="url" inputmode="url" autocomplete="off" placeholder="https://.../chat/completions">
+                  </label>
+                  <label class="field-label" for="api-key">
+                    <strong>API Key</strong>
+                    <input class="field-input" id="api-key" type="password" autocomplete="off" placeholder="只保存在本机">
+                  </label>
+                  <label class="field-label" for="api-model">
+                    <strong>模型名称</strong>
+                    <input class="field-input" id="api-model" type="text" autocomplete="off" placeholder="例如：deepseek-chat">
+                  </label>
+                  <label class="field-label" for="api-proxy">
+                    <strong>Worker 中转地址</strong>
+                    <input class="field-input" id="api-proxy" type="url" inputmode="url" autocomplete="off" placeholder="https://xiaoma-api.你的账号.workers.dev">
+                  </label>
+                </div>
+                <p class="field-help">直接连接适合个人使用；公开网站请使用 Worker 中转，避免把 API Key 暴露给访问者。</p>
+                <div class="form-actions">
+                  <button class="test-secondary" type="button" id="test-api">
+                    <i data-lucide="plug-zap" width="14" height="14" aria-hidden="true"></i>
+                    测试连接
+                  </button>
+                  <button class="save-primary" type="button" id="save-api">
+                    <i data-lucide="check" width="14" height="14" aria-hidden="true"></i>
+                    保存 API
+                  </button>
+                </div>
+                <div class="api-status" id="api-status" role="status" aria-live="polite">填写模型配置后，点击“测试连接”。</div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div class="toast" id="proto-toast" role="status" aria-live="polite"></div>
+        <div class="home-indicator" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <div class="stage-caption" aria-hidden="true">
+      <span><i></i>切换回复模式</span>
+      <span><i></i>转发 TA 的消息</span>
+      <span><i></i>记录你实际发出的回复</span>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const root = document.getElementById("reply-prototype");
+      const screens = [...root.querySelectorAll(".screen")];
+      const toast = root.getElementById ? root.getElementById("proto-toast") : document.getElementById("proto-toast");
+      let currentRelation = "领导";
+      let activeReply = 0;
+      let toastTimer = null;
+      let selectedSuggestions = [];
+      let simMode = "高情商";
+      let composeKind = "me";
+      let currentSuggestions = [];
+      let isGenerating = false;
+      let simConversation = [
+        { from: "them", text: "你今天怎么一直没回我，是不是我哪里惹你了？" },
+        { from: "me", text: "刚在开会，刚看到。" },
+        { from: "them", text: "真的吗？我总觉得你最近在躲我。" }
+      ];
+      let contactProfile = {
+        name: "阿澄",
+        relation: "喜欢的人",
+        personality: "敏感，会反复确认关系，但不喜欢被敷衍",
+        stance: "他觉得自己最近被疏远，正在试探你是否还在乎这段关系",
+        goal: "消除误会，给出确定感，但不要显得卑微或油腻"
+      };
+      let apiConfig = {
+        provider: "deepseek",
+        mode: "direct",
+        endpoint: "https://api.deepseek.com/chat/completions",
+        apiKey: "",
+        model: "deepseek-chat",
+        proxyUrl: ""
+      };
+      const STORAGE_KEY = "xiaoma-app-state-v1";
+      const providerPresets = {
+        deepseek: {
+          endpoint: "https://api.deepseek.com/chat/completions",
+          model: "deepseek-chat"
+        },
+        qwen: {
+          endpoint: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+          model: "qwen-plus"
+        },
+        zhipu: {
+          endpoint: "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+          model: "glm-4-flash"
+        },
+        openrouter: {
+          endpoint: "https://openrouter.ai/api/v1/chat/completions",
+          model: "openai/gpt-4o-mini"
+        },
+        custom: {
+          endpoint: "",
+          model: ""
+        }
+      };
+
+      const simModes = {
+        "高情商": {
+          angle: "先接住情绪，再回应关系，不急着讲道理",
+          pill: "先接住情绪",
+          replies: [
+            {
+              label: "最自然",
+              text: "没有躲你。最近事情确实有点多，回得慢了，但这不是你让我有压力。你不用自己猜，我忙完会好好找你。",
+              why: "回应“是不是被躲开”的猜测，不把原因推给对方"
+            },
+            {
+              label: "更柔软",
+              text: "让你这么想，我会有点过意不去。不是你的问题，是我这两天状态有点乱，给我一点时间缓过来。",
+              why: "有共情也有事实，短句更像平时说话"
+            },
+            {
+              label: "更坦诚",
+              text: "我没有故意冷着你。只是最近有点累，话变少了。你愿意直接问我，我还挺在意的。",
+              why: "不回避自己的状态，同时让对方感到被重视"
+            }
+          ]
+        },
+        "暖男": {
+          angle: "先把不安接住，再给一个具体、可兑现的靠近动作",
+          pill: "多给确定感",
+          replies: [
+            {
+              label: "有温度",
+              text: "别乱想，不是你惹我。最近是真的忙，但你再这么问我会心疼。晚上忙完给你打电话？",
+              why: "先否认误会，再用明确行动替代空泛安慰"
+            },
+            {
+              label: "有点宠",
+              text: "没有躲你。要真躲你，我现在哪敢回这么快。只是这两天累得有点闷，让我缓一下，好吗？",
+              why: "轻一点化解紧张，但不靠油腻情话"
+            },
+            {
+              label: "认真版",
+              text: "不是你让我有压力，是我自己状态不太好。你不用猜，我忙完会主动找你。",
+              why: "把责任说清楚，给对方稳定的预期"
+            }
+          ]
+        },
+        "温柔坚定": {
+          angle: "不讨好也不冷处理，把边界和在乎同时说清楚",
+          pill: "有边界也有关心",
+          replies: [
+            {
+              label: "有分寸",
+              text: "不是你的问题，我最近确实需要一点自己的时间。回得慢不代表我不在乎你。",
+              why: "边界明确，但保留关系里的确定感"
+            },
+            {
+              label: "更直接",
+              text: "我没有躲你，但这两天有点累，不想勉强自己聊天。晚点状态好了我会主动找你。",
+              why: "坦诚说明精力有限，避免为了安抚而硬撑"
+            },
+            {
+              label: "不内耗",
+              text: "你可以直接问我，我也会坦白说。现在我需要缓一缓，不是要跟你拉开距离。",
+              why: "鼓励直接沟通，同时不承接不该有的自责"
+            }
+          ]
+        },
+        "松弛幽默": {
+          angle: "用轻松感拆掉紧张，但不回避真正的问题",
+          pill: "别把气氛拉太紧",
+          replies: [
+            {
+              label: "松弛",
+              text: "没躲你，主要是工作把我绑架了。刚逃出来就来找你了。",
+              why: "用玩笑缓解追问，下一句需要自然接回对方"
+            },
+            {
+              label: "有点皮",
+              text: "我要真想躲，哪会挑这么容易被抓包的方式。别自己吓自己。",
+              why: "把误会说轻，但不攻击对方的多想"
+            },
+            {
+              label: "轻里认真",
+              text: "最近确实有点低电量，但不是对你关机。让我充会儿电，晚点找你。",
+              why: "玩笑之后仍把真实状态说明白"
+            }
+          ]
+        },
+        "职场稳妥": {
+          angle: "不放大情绪，先澄清事实，再说明什么时候回复",
+          pill: "稳预期不背锅",
+          replies: [
+            {
+              label: "稳妥",
+              text: "没有躲你。最近工作安排比较满，回消息会慢一些，但与你无关。",
+              why: "事实清楚，不制造额外情绪承诺"
+            },
+            {
+              label: "简洁",
+              text: "不是你的问题。我这两天精力有限，可能会少聊一点，忙完会主动联系你。",
+              why: "给出状态、原因和下一步，减少反复追问"
+            },
+            {
+              label: "有边界",
+              text: "我没故意冷着你。需要一点时间处理自己的事，和我怎么看你没有关系。",
+              why: "把工作或私人状态与关系评价明确分开"
+            }
+          ]
+        },
+        "真诚直接": {
+          angle: "把真实想法说清楚，不绕弯，也不把情绪甩给对方",
+          pill: "坦率但有分寸",
+          replies: [
+            {
+              label: "坦白",
+              text: "我没躲你，最近确实有点累，回消息也变慢了。你刚才那样问，我会觉得你是不是有点不安。",
+              why: "直接说明状态，也把观察到的不安说出来"
+            },
+            {
+              label: "清清楚",
+              text: "不是你的问题。我这两天想安静一点，但不是不想理你；等缓过来我会主动找你。",
+              why: "不给出模糊承诺，同时让对方知道关系没有变化"
+            },
+            {
+              label: "不敷衍",
+              text: "我没有故意冷着你。现在有点累，可能回得慢，但你要是不舒服可以直接跟我说。",
+              why: "保留边界，也邀请对方用更直接的方式沟通"
+            }
+          ]
+        }
+      };
+
+      const data = {
+        "领导": {
+          name: "周总",
+          context: "工作沟通",
+          source: "截图",
+          intent: "争取时间 · 稳住预期",
+          conversation: [
+            { text: "今晚能把方案发我吗？明早开会要用。", me: false },
+            { text: "还在补最后的预算数据。", me: true }
+          ],
+          replies: [
+            {
+              style: "稳妥版",
+              fit: "最不容易出错",
+              text: "周总，我理解您明早要用。今晚我会先把框架和核心结论发您，完整数据明早 9 点前补齐，方便您先看重点。",
+              why: "先接住对方的时间压力，再给出明确交付节奏，不空口保证全部完成。"
+            },
+            {
+              style: "担当版",
+              fit: "更主动",
+              text: "今晚可以发您一版，核心方案已经齐了；预算数据还差最后核对，我会标出待确认项，不耽误您明早先过整体思路。",
+              why: "主动推进的同时说明信息边界，比笼统说“尽量”更容易建立信任。"
+            },
+            {
+              style: "边界版",
+              fit: "工作量较大时",
+              text: "今晚我能先交方案主体和关键结论，完整版需要明早补齐。您看这样是否够用于会议？如果不行，我现在优先调整您最关心的部分。",
+              why: "不硬撑承诺，把选择权交还对方，也保留了协商空间。"
+            }
+          ]
+        },
+        "客户": {
+          name: "林女士",
+          context: "客户沟通",
+          source: "截图",
+          intent: "安抚情绪 · 重建预期",
+          conversation: [
+            { text: "为什么还没上线？我们这边已经等很久了。", me: false },
+            { text: "上周我们已经同步过需要再确认一项内容。", me: true }
+          ],
+          replies: [
+            {
+              style: "安抚版",
+              fit: "优先稳情绪",
+              text: "理解您着急，这次等待确实超出您的预期。我先说结论：今天 5 点前给您明确的上线时间，并把目前还卡住的一项单独列清楚，避免再有信息差。",
+              why: "先承认对方感受，再用具体时间和事项恢复掌控感。"
+            },
+            {
+              style: "澄清版",
+              fit: "避免背锅",
+              text: "抱歉让您等这么久。目前还剩一项确认没有闭环，这也是上线时间未定的原因。我现在直接和负责人对齐，今天下午给您可执行的排期。",
+              why: "解释原因但不推责，把重点放在下一步如何解决。"
+            },
+            {
+              style: "边界版",
+              fit: "不接受施压",
+              text: "我理解您希望尽快上线，我们也在按最快节奏推进。在关键项确认前我不能给不准确的承诺；今天 5 点前我会给您明确节点和责任人。",
+              why: "既不迎合模糊承诺，也不让对方觉得被敷衍。"
+            }
+          ]
+        },
+        "朋友": {
+          name: "阿澄",
+          context: "朋友沟通",
+          source: "截图",
+          intent: "回应关系 · 消除误会",
+          conversation: [
+            { text: "你最近是不是不想理我？", me: false },
+            { text: "这两天事情有点多，不是故意不回。", me: true }
+          ],
+          replies: [
+            {
+              style: "真诚版",
+              fit: "最像本人",
+              text: "不是不想理你，是我这两天状态有点乱，回消息也变慢了。让你这么想我挺过意不去的，晚点我忙完给你打个电话？",
+              why: "直接回应误会，同时给出具体行动，不把解释停在“我很忙”。"
+            },
+            {
+              style: "轻松版",
+              fit: "缓和气氛",
+              text: "真没有，我这两天像被工作按住了。你突然这么问我还挺在意的，今晚忙完找你，想听你说说最近怎么了。",
+              why: "用轻一点的方式澄清，又把话题转回对方。"
+            },
+            {
+              style: "边界版",
+              fit: "需要留空间",
+              text: "不是不想理你，我最近确实需要一点自己的时间。可能回得慢，但不代表我不在乎你；忙完我会主动找你。",
+              why: "清楚表达需要空间，也给出关系承诺，避免冷处理。"
+            }
+          ]
+        }
+      };
+
+      function safeIconRefresh() {
+        if (window.lucide && typeof window.lucide.createIcons === "function") {
+          window.lucide.createIcons({ attrs: { width: 16, height: 16 } });
+        }
+      }
+
+      function showScreen(id) {
+        screens.forEach(screen => {
+          screen.classList.toggle("is-active", screen.id === `screen-${id}`);
+        });
+        if (id === "api") populateApiForm();
+        if (id === "contact") populateContactForm();
+        if (id === "simulator") {
+          updateContactUI();
+          renderSimThread();
+        }
+        safeIconRefresh();
+      }
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add("is-visible");
+        window.clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(() => toast.classList.remove("is-visible"), 1900);
+      }
+
+      function escapeHTML(value) {
+        return value.replace(/[&<>"']/g, character => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          "\"": "&quot;",
+          "'": "&#039;"
+        })[character]);
+      }
+
+      function loadPersistedState() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+          if (!saved) return;
+          if (Array.isArray(saved.simConversation)) {
+            simConversation = saved.simConversation
+              .filter(message => message && ["them", "me"].includes(message.from) && typeof message.text === "string")
+              .slice(-200);
+          }
+          if (saved.contactProfile) {
+            contactProfile = { ...contactProfile, ...saved.contactProfile };
+          }
+          if (saved.apiConfig) {
+            apiConfig = { ...apiConfig, ...saved.apiConfig };
+          }
+          if (saved.simMode && simModes[saved.simMode]) {
+            simMode = saved.simMode;
+          }
+        } catch (error) {
+          console.warn("Could not restore local state", error);
+        }
+      }
+
+      function persistState() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            simConversation,
+            contactProfile,
+            apiConfig,
+            simMode
+          }));
+        } catch (error) {
+          console.warn("Could not save local state", error);
+        }
+      }
+
+      function normalizeEndpoint(endpoint) {
+        const trimmed = endpoint.trim().replace(/\/+$/, "");
+        if (!trimmed) return "";
+        if (/\/chat\/completions$/i.test(trimmed)) return trimmed;
+        return `${trimmed}/chat/completions`;
+      }
+
+      function readApiForm() {
+        return {
+          provider: document.getElementById("api-provider").value,
+          mode: document.getElementById("api-mode").value,
+          endpoint: document.getElementById("api-endpoint").value.trim(),
+          apiKey: document.getElementById("api-key").value.trim(),
+          model: document.getElementById("api-model").value.trim(),
+          proxyUrl: document.getElementById("api-proxy").value.trim()
+        };
+      }
+
+      function populateApiForm() {
+        document.getElementById("api-provider").value = apiConfig.provider || "custom";
+        document.getElementById("api-mode").value = apiConfig.mode || "direct";
+        document.getElementById("api-endpoint").value = apiConfig.endpoint || "";
+        document.getElementById("api-key").value = apiConfig.apiKey || "";
+        document.getElementById("api-model").value = apiConfig.model || "";
+        document.getElementById("api-proxy").value = apiConfig.proxyUrl || "";
+      }
+
+      function populateContactForm() {
+        document.getElementById("contact-name").value = contactProfile.name || "";
+        document.getElementById("contact-relation").value = contactProfile.relation || "其他";
+        document.getElementById("contact-personality").value = contactProfile.personality || "";
+        document.getElementById("contact-stance").value = contactProfile.stance || "";
+        document.getElementById("contact-goal").value = contactProfile.goal || "";
+      }
+
+      function isApiConfigured(config = apiConfig) {
+        if (config.mode === "proxy") {
+          return Boolean(config.proxyUrl);
+        }
+        return Boolean(config.endpoint && config.apiKey && config.model);
+      }
+
+      function updateConnectionUI(connected = null, config = apiConfig) {
+        const configured = isApiConfigured(config);
+        const summary = document.getElementById("api-settings-summary");
+        const connection = document.getElementById("api-connection-summary");
+        const label = document.getElementById("api-connection-label");
+        const contactSummary = document.getElementById("contact-settings-summary");
+
+        if (configured) {
+          const route = config.mode === "proxy" ? "Worker 中转" : "网页直连";
+          summary.textContent = `${config.model || "默认模型"} · ${route}`;
+          label.textContent = connected === true ? "连接成功" : "已配置";
+        } else {
+          summary.textContent = "尚未配置模型";
+          label.textContent = "未连接";
+        }
+        connection.classList.toggle("is-connected", connected === true || configured);
+        contactSummary.textContent = `${contactProfile.relation || "其他"} · ${contactProfile.stance || "未填写立场"}`;
+      }
+
+      function updateContactUI() {
+        const displayName = contactProfile.name || "对方";
+        const shortName = displayName.slice(-1);
+        document.getElementById("sim-contact-avatar").textContent = shortName;
+        document.getElementById("sim-contact-heading").textContent = `和${displayName}的沟通演练`;
+        document.getElementById("sim-contact-pill").innerHTML =
+          `<i data-lucide="contact-round" width="9" height="9" aria-hidden="true"></i><span id="sim-contact-relation">${escapeHTML(contactProfile.relation || "其他")}</span>`;
+        document.getElementById("contact-settings-summary").textContent =
+          `${contactProfile.relation || "其他"} · ${contactProfile.stance || "未填写立场"}`;
+      }
+
+      function setApiStatus(message, type = "") {
+        const status = document.getElementById("api-status");
+        status.textContent = message;
+        status.classList.toggle("is-error", type === "error");
+        status.classList.toggle("is-ok", type === "ok");
+      }
+
+      function buildConversationPrompt() {
+        const transcript = simConversation
+          .map((message, index) => `${index + 1}. ${message.from === "them" ? "对方" : "我"}：${message.text}`)
+          .join("\n");
+        const clippedTranscript = transcript.length > 24000
+          ? `（较早内容已压缩，以下保留最近对话）\n${transcript.slice(-24000)}`
+          : transcript;
+        const mode = simModes[simMode];
+        const system = `你是“小马”，一个主攻中文日常沟通的回复参谋。你必须理解整段聊天，而不是只回应最后一句话。
+
+人物档案：
+- 对方称呼：${contactProfile.name}
+- 与用户关系：${contactProfile.relation}
+- 对方性格：${contactProfile.personality || "未提供"}
+- 对方当前立场：${contactProfile.stance || "请从聊天中谨慎判断"}
+- 用户本次目标：${contactProfile.goal || "自然、得体地推进沟通"}
+
+当前模式：${simMode}
+回复角度：${mode.angle}
+
+整段聊天记录：
+${clippedTranscript}
+
+要求：
+1. 先综合关系、权力位置、对方当前立场、双方情绪变化和未解决问题，再生成回复。
+2. 不把聊天中没有依据的信息当成事实；不确定时保持开放，不替用户编造经历。
+3. 三条回复分别代表三个略有差异的有效策略，不要只换同义词。
+4. 像真实的人发微信：默认 1 至 2 句，口语自然，不要长篇讲道理。
+5. 避免 AI 套话和油腻表达，例如“我理解你的感受”“希望这能帮到你”“你值得被爱”“宝子”“亲爱的”，不要滥用表情、感叹号、昵称或空洞夸赞。
+6. 高情商不等于讨好或操控。既要照顾关系，也要表达用户真实边界。
+7. 只输出 JSON，不要代码围栏或额外说明。格式严格为：
+{"reading":"一句不超过35字的当前关系判断","replies":[{"label":"最自然","text":"可直接发送的回复","why":"不超过25字的策略理由"},{"label":"更温柔","text":"可直接发送的回复","why":"策略理由"},{"label":"更有边界","text":"可直接发送的回复","why":"策略理由"}]}`;
+        return [
+          { role: "system", content: system },
+          { role: "user", content: `请根据以上完整聊天和人物档案，按“${simMode}”模式给出三条回复。` }
+        ];
+      }
+
+      async function requestChatCompletion(messages, config = apiConfig, maxTokens = 700) {
+        let url;
+        const headers = { "Content-Type": "application/json" };
+        const payload = {
+          model: config.model || undefined,
+          messages,
+          temperature: 0.72,
+          max_tokens: maxTokens,
+          stream: false
+        };
+
+        if (config.mode === "proxy") {
+          if (!config.proxyUrl) throw new Error("还没有填写 Worker 中转地址");
+          url = config.proxyUrl;
+        } else {
+          if (!config.endpoint) throw new Error("还没有填写 API 地址");
+          if (!config.apiKey) throw new Error("还没有填写 API Key");
+          url = normalizeEndpoint(config.endpoint);
+          headers.Authorization = `Bearer ${config.apiKey}`;
+        }
+
+        let response;
+        try {
+          response = await fetch(url, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(payload)
+          });
+        } catch (error) {
+          throw new Error(config.mode === "proxy"
+            ? "无法连接 Worker，请检查地址和网络"
+            : "浏览器请求被拦截，可能是 CORS 限制，建议改用 Worker 中转");
+        }
+
+        const raw = await response.text();
+        if (!response.ok) {
+          let detail = raw;
+          try {
+            const parsed = JSON.parse(raw);
+            detail = parsed.error?.message || parsed.message || raw;
+          } catch (error) {
+            // Keep the plain response when the provider did not return JSON.
+          }
+          throw new Error(`API 返回 ${response.status}：${String(detail).slice(0, 140)}`);
+        }
+
+        let result;
+        try {
+          result = JSON.parse(raw);
+        } catch (error) {
+          throw new Error("API 返回的内容不是有效 JSON");
+        }
+
+        const content = result.choices?.[0]?.message?.content;
+        if (Array.isArray(content)) {
+          return content.map(item => item.text || "").join("");
+        }
+        if (typeof content !== "string" || !content.trim()) {
+          throw new Error("API 没有返回可用文本");
+        }
+        return content.trim();
+      }
+
+      function parseGeneratedReplies(content) {
+        let text = content.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+        const firstBrace = text.indexOf("{");
+        const lastBrace = text.lastIndexOf("}");
+        if (firstBrace >= 0 && lastBrace > firstBrace) {
+          text = text.slice(firstBrace, lastBrace + 1);
+        }
+
+        let parsed;
+        try {
+          parsed = JSON.parse(text);
+        } catch (error) {
+          const lines = content.split(/\n+/).map(line => line.replace(/^[\d\-\s.、]+/, "").trim()).filter(Boolean);
+          return {
+            reading: "已结合整段对话生成候选回复",
+            replies: lines.slice(0, 3).map((line, index) => ({
+              label: ["最自然", "更温柔", "更有边界"][index] || "备选",
+              text: line.slice(0, 180),
+              why: "按当前人物关系和聊天上下文生成"
+            }))
+          };
+        }
+
+        const replies = Array.isArray(parsed.replies)
+          ? parsed.replies
+            .filter(reply => reply && typeof reply.text === "string" && reply.text.trim())
+            .slice(0, 3)
+            .map((reply, index) => ({
+              label: String(reply.label || ["最自然", "更温柔", "更有边界"][index] || "备选").slice(0, 8),
+              text: String(reply.text).trim().slice(0, 220),
+              why: String(reply.why || "结合完整聊天生成").trim().slice(0, 60)
+            }))
+          : [];
+        if (!replies.length) throw new Error("模型没有返回三条可用回复");
+        return {
+          reading: String(parsed.reading || "已结合整段对话生成候选回复").trim().slice(0, 80),
+          replies
+        };
+      }
+
+      function renderSimLoading() {
+        document.getElementById("sim-mode-title").textContent = `${simMode}分析中`;
+        document.getElementById("sim-mode-angle").textContent = "正在读取人物关系、整段聊天和情绪变化…";
+        document.getElementById("sim-ai-source").textContent = "分析中";
+        document.getElementById("sim-reply-list").innerHTML = `
+          <div class="sim-loading-card">
+            <strong>正在理解整段对话</strong>
+            不是只看最后一句话，会同时判断对方立场、双方关系和你想达到的效果。
+          </div>
+        `;
+      }
+
+      function updateThreadReading(text) {
+        const insight = document.querySelector("#sim-thread .thread-insight");
+        if (insight && text) insight.textContent = text;
+      }
+
+      async function generateWithAI(showSuccess = true) {
+        if (isGenerating) return;
+        if (!isApiConfigured()) {
+          renderSimSuggestions();
+          showToast("当前使用本地示例，请先在“我的 → 模型 API”中配置");
+          return;
+        }
+        if (!simConversation.some(message => message.from === "them")) {
+          renderSimSuggestions();
+          showToast("先转发一条 TA 发来的消息再分析");
+          return;
+        }
+
+        isGenerating = true;
+        renderSimLoading();
+        try {
+          const content = await requestChatCompletion(buildConversationPrompt(), apiConfig, 900);
+          const generated = parseGeneratedReplies(content);
+          currentSuggestions = generated.replies;
+          renderSimSuggestions(generated.replies, "AI 已分析");
+          updateThreadReading(generated.reading);
+          if (showSuccess) showToast("已结合完整聊天重新生成");
+        } catch (error) {
+          renderSimSuggestions();
+          document.getElementById("sim-ai-source").textContent = "连接失败";
+          showToast(error.message || "生成失败，请检查 API 设置");
+        } finally {
+          isGenerating = false;
+        }
+      }
+
+      async function testApiConnection() {
+        const config = readApiForm();
+        if (!isApiConfigured(config)) {
+          setApiStatus("配置不完整：直连需要地址、Key 和模型；中转需要 Worker 地址。", "error");
+          return;
+        }
+        setApiStatus("正在测试连接…");
+        try {
+          const content = await requestChatCompletion([
+            { role: "system", content: "Reply with exactly: OK" },
+            { role: "user", content: "Connection test" }
+          ], config, 8);
+          setApiStatus(`连接成功：${content.slice(0, 80)}`, "ok");
+          updateConnectionUI(true, config);
+        } catch (error) {
+          setApiStatus(error.message || "连接失败", "error");
+        }
+      }
+
+      function renderSimThread() {
+        const thread = document.getElementById("sim-thread");
+        const contextCount = document.getElementById("sim-context-count");
+        const lastIncoming = [...simConversation].reverse().find(message => message.from === "them");
+        const counterpartAvatar = (contactProfile.name || "对").slice(-1);
+
+        thread.innerHTML = `
+          <span class="thread-time">今天 20:14</span>
+          ${simConversation.map((message, index) => {
+            const isMe = message.from === "me";
+            return `
+              <div class="thread-message${isMe ? " me" : ""}">
+                <span class="thread-avatar" aria-hidden="true">${isMe ? "我" : escapeHTML(counterpartAvatar)}</span>
+                <div class="thread-bubble">
+                  ${escapeHTML(message.text)}
+                  <small>${isMe ? "你实际发给他" : "从聊天转到这里"} · ${20 + Math.floor(index / 2)}:${14 + index * 2}</small>
+                </div>
+              </div>
+            `;
+          }).join("")}
+          <div class="thread-insight">
+            ${contactProfile.stance
+              ? `对方当前立场：${escapeHTML(contactProfile.stance)}`
+              : lastIncoming
+                ? "继续补充双方消息，小马会结合整段聊天判断对方立场。"
+                : "继续补充双方消息，建议会更贴近真实语境。"}
+          </div>
+        `;
+
+        contextCount.textContent = `已记住 ${simConversation.length} 条沟通内容 · 上下文会持续保留`;
+        requestAnimationFrame(() => {
+          thread.scrollTop = thread.scrollHeight;
+        });
+      }
+
+      function renderSimSuggestions(replies = null, source = "本地演示") {
+        const mode = simModes[simMode];
+        const list = document.getElementById("sim-reply-list");
+        const title = document.getElementById("sim-mode-title");
+        const angle = document.getElementById("sim-mode-angle");
+        const anglePill = document.getElementById("sim-angle-pill");
+        const sourceLabel = document.getElementById("sim-ai-source");
+        currentSuggestions = replies && replies.length
+          ? replies
+          : mode.replies.map(reply => ({ ...reply }));
+
+        title.textContent = `${simMode}建议`;
+        angle.textContent = mode.angle;
+        anglePill.innerHTML = `<i data-lucide="compass" width="9" height="9" aria-hidden="true"></i>${mode.pill}`;
+        sourceLabel.textContent = source;
+
+        list.innerHTML = currentSuggestions.map((reply, index) => `
+          <article class="sim-reply-card${index === 0 ? " is-selected" : ""}" data-sim-card="${index}">
+            <div class="sim-reply-content">
+              <p>${escapeHTML(reply.text)}</p>
+              <span>${escapeHTML(reply.label)} · ${escapeHTML(reply.why)}</span>
+            </div>
+            <div class="sim-reply-actions">
+              <button class="sim-mini-action" type="button" data-copy-sim="${index}">复制</button>
+              <button class="sim-mini-action primary" type="button" data-adopt-sim="${index}">用这句</button>
+            </div>
+          </article>
+        `).join("");
+
+        document.querySelectorAll("[data-mode]").forEach(chip => {
+          chip.classList.toggle("is-active", chip.dataset.mode === simMode);
+        });
+        safeIconRefresh();
+      }
+
+      function setComposeKind(kind) {
+        composeKind = kind;
+        document.querySelectorAll("[data-compose-kind]").forEach(button => {
+          button.classList.toggle("is-active", button.dataset.composeKind === kind);
+        });
+        const input = document.getElementById("sim-input");
+        input.placeholder = kind === "them"
+          ? "粘贴对方刚发来的消息…"
+          : "记录你实际发出的回复…";
+      }
+
+      async function submitSimMessage() {
+        const input = document.getElementById("sim-input");
+        const text = input.value.trim();
+
+        if (!text) {
+          showToast("先粘贴一条聊天内容");
+          input.focus();
+          return;
+        }
+
+        const submittedKind = composeKind;
+        simConversation.push({ from: submittedKind, text });
+        input.value = "";
+        persistState();
+        renderSimThread();
+
+        if (submittedKind === "them") {
+          showToast("已加入上下文，正在按当前模式重排建议");
+          await generateWithAI();
+        } else {
+          showToast("已记下你的实际回复，后续会参考你的语气");
+          window.setTimeout(() => setComposeKind("them"), 420);
+        }
+
+        safeIconRefresh();
+      }
+
+      function renderAnalysis() {
+        const sample = data[currentRelation];
+        const name = document.getElementById("context-name");
+        const conversation = document.getElementById("analysis-conversation");
+        const intent = document.getElementById("intent-label");
+        const stack = document.getElementById("reply-stack");
+        const keyboardName = document.getElementById("keyboard-chat-name");
+        const keyboardPrompt = document.getElementById("keyboard-prompt");
+
+        name.textContent = sample.name;
+        name.parentElement.querySelector("span").textContent = `· ${sample.context}`;
+        intent.innerHTML = `<i data-lucide="target" width="10" height="10" aria-hidden="true"></i>${sample.intent}`;
+        keyboardName.textContent = sample.name;
+        keyboardPrompt.textContent = sample.conversation[0].text;
+
+        conversation.innerHTML = sample.conversation.map(message => (
+          `<div class="mini-bubble${message.me ? " me" : ""}">${message.text}</div>`
+        )).join("");
+
+        stack.innerHTML = sample.replies.map((reply, index) => `
+          <article class="reply-card${index === 0 ? " is-selected" : ""}" data-reply-card="${index}">
+            <div class="reply-top">
+              <span class="style-dot" aria-hidden="true"></span>
+              <span class="reply-style">${reply.style}</span>
+              <span class="reply-fit">${reply.fit}</span>
+            </div>
+            <p class="reply-text">${reply.text}</p>
+            <div class="reply-why">
+              <i data-lucide="lightbulb" width="11" height="11" aria-hidden="true"></i>
+              <span>${reply.why}</span>
+            </div>
+            <div class="reply-actions">
+              <button class="reply-action" type="button" data-copy-reply="${index}">
+                <i data-lucide="copy" width="12" height="12" aria-hidden="true"></i>
+                复制
+              </button>
+              <button class="reply-action primary" type="button" data-use-reply="${index}">
+                <i data-lucide="keyboard" width="12" height="12" aria-hidden="true"></i>
+                用键盘插入
+              </button>
+            </div>
+          </article>
+        `).join("");
+
+        document.querySelectorAll(".relation-chip").forEach(chip => {
+          chip.classList.toggle("is-active", chip.dataset.relation === currentRelation);
+        });
+
+        selectedSuggestions = sample.replies.map(reply => reply.text);
+        renderKeyboardSuggestions();
+        safeIconRefresh();
+      }
+
+      function renderKeyboardSuggestions() {
+        const strip = document.getElementById("keyboard-suggestions");
+        strip.innerHTML = selectedSuggestions.map((text, index) => `
+          <button class="suggestion-pill${index === activeReply ? " is-active" : ""}" type="button" data-suggestion="${index}">
+            <strong>${["稳妥", "亲近", "边界"][index]}</strong>
+            <span>${text}</span>
+          </button>
+        `).join("");
+      }
+
+      function previewReply(index) {
+        activeReply = index;
+        const sample = data[currentRelation];
+        const text = sample.replies[index].text;
+        document.getElementById("message-input").value = text;
+        document.querySelectorAll(".reply-card").forEach(card => {
+          card.classList.toggle("is-selected", Number(card.dataset.replyCard) === index);
+        });
+        renderKeyboardSuggestions();
+        showScreen("keyboard");
+      }
+
+      function copyText(text, successMessage) {
+        const fallback = () => {
+          const area = document.createElement("textarea");
+          area.value = text;
+          area.setAttribute("readonly", "");
+          area.style.position = "absolute";
+          area.style.left = "-9999px";
+          root.appendChild(area);
+          area.select();
+          try { document.execCommand("copy"); } catch (error) { /* Clipboard can be restricted in preview. */ }
+          area.remove();
+          showToast(successMessage);
+        };
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(() => showToast(successMessage)).catch(fallback);
+        } else {
+          fallback();
+        }
+      }
+
+      function beginAnalysis(source) {
+        const sample = data[currentRelation];
+        const sourceLabel = source === "clipboard" ? "剪贴板" : "截图";
+        document.getElementById("loading-copy").textContent = source === "clipboard"
+          ? "读取刚刚复制的消息，判断关系与情绪…"
+          : "识别截图中的对话、关系与情绪…";
+        document.getElementById("analysis-source").textContent = `已从${sourceLabel}识别 ${sample.conversation.length} 条消息`;
+        showScreen("loading");
+        window.setTimeout(() => {
+          renderAnalysis();
+          showScreen("analysis");
+        }, 680);
+      }
+
+      root.addEventListener("click", event => {
+        const go = event.target.closest("[data-go]");
+        if (go) {
+          showScreen(go.dataset.go);
+          return;
+        }
+
+        if (event.target.closest("#save-contact")) {
+          contactProfile = {
+            name: document.getElementById("contact-name").value.trim() || "对方",
+            relation: document.getElementById("contact-relation").value,
+            personality: document.getElementById("contact-personality").value.trim(),
+            stance: document.getElementById("contact-stance").value.trim(),
+            goal: document.getElementById("contact-goal").value.trim()
+          };
+          persistState();
+          updateContactUI();
+          renderSimThread();
+          showToast("人物档案已保存，下次分析会参考这些信息");
+          window.setTimeout(() => showScreen("simulator"), 420);
+          return;
+        }
+
+        if (event.target.closest("#save-api")) {
+          apiConfig = readApiForm();
+          persistState();
+          populateApiForm();
+          updateConnectionUI();
+          setApiStatus(isApiConfigured()
+            ? "API 配置已保存。建议点击“测试连接”确认是否能正常调用。"
+            : "配置尚未填写完整。", isApiConfigured() ? "ok" : "error");
+          showToast("API 配置已保存在本机");
+          return;
+        }
+
+        if (event.target.closest("#test-api")) {
+          void testApiConnection();
+          return;
+        }
+
+        if (event.target.closest("#sim-regenerate")) {
+          void generateWithAI();
+          return;
+        }
+
+        if (event.target.closest("#clear-conversation")) {
+          if (window.confirm("清空本机保存的全部聊天记录？人物档案和 API 设置会保留。")) {
+            simConversation = [];
+            persistState();
+            renderSimThread();
+            renderSimSuggestions();
+            showToast("聊天记录已清空");
+          }
+          return;
+        }
+
+        const mode = event.target.closest("[data-mode]");
+        if (mode) {
+          simMode = mode.dataset.mode;
+          persistState();
+          if (isApiConfigured()) {
+            void generateWithAI();
+          } else {
+            renderSimSuggestions();
+          }
+          showToast(`已切换为“${simMode}”，换一种角度给建议`);
+          return;
+        }
+
+        const compose = event.target.closest("[data-compose-kind]");
+        if (compose) {
+          setComposeKind(compose.dataset.composeKind);
+          document.getElementById("sim-input").focus();
+          return;
+        }
+
+        const copySim = event.target.closest("[data-copy-sim]");
+        if (copySim) {
+          const reply = currentSuggestions[Number(copySim.dataset.copySim)];
+          if (!reply) return;
+          copyText(reply.text, "这句已复制，可以发到聊天软件");
+          return;
+        }
+
+        const adoptSim = event.target.closest("[data-adopt-sim]");
+        if (adoptSim) {
+          const index = Number(adoptSim.dataset.adoptSim);
+          const reply = currentSuggestions[index];
+          if (!reply) return;
+          document.querySelectorAll("[data-sim-card]").forEach(card => {
+            card.classList.toggle("is-selected", Number(card.dataset.simCard) === index);
+          });
+          setComposeKind("me");
+          const input = document.getElementById("sim-input");
+          input.value = reply.text;
+          input.focus();
+          showToast("已放进“我刚发的”，可修改后再记录");
+          return;
+        }
+
+        const analyze = event.target.closest("[data-analyze]");
+        if (analyze) {
+          beginAnalysis(analyze.dataset.analyze);
+          return;
+        }
+
+        const relation = event.target.closest("[data-relation]");
+        if (relation) {
+          currentRelation = relation.dataset.relation;
+          activeReply = 0;
+          renderAnalysis();
+          showToast(`已按“${currentRelation}”关系重排建议`);
+          return;
+        }
+
+        const copyReply = event.target.closest("[data-copy-reply]");
+        if (copyReply) {
+          const reply = data[currentRelation].replies[Number(copyReply.dataset.copyReply)];
+          copyText(reply.text, "回复已复制，可以粘贴到聊天窗口");
+          return;
+        }
+
+        const useReply = event.target.closest("[data-use-reply]");
+        if (useReply) {
+          previewReply(Number(useReply.dataset.useReply));
+          return;
+        }
+
+        const suggestion = event.target.closest("[data-suggestion]");
+        if (suggestion) {
+          activeReply = Number(suggestion.dataset.suggestion);
+          document.getElementById("message-input").value = selectedSuggestions[activeReply];
+          renderKeyboardSuggestions();
+          showToast("建议已插入输入框，可继续修改");
+          return;
+        }
+
+        const toastButton = event.target.closest("[data-toast]");
+        if (toastButton) {
+          showToast(toastButton.dataset.toast);
+          return;
+        }
+
+        const history = event.target.closest("[data-open-history]");
+        if (history) {
+          currentRelation = history.dataset.openHistory;
+          activeReply = 0;
+          renderAnalysis();
+          document.getElementById("analysis-source").textContent = "已从记录恢复 2 条消息";
+          showScreen("analysis");
+          return;
+        }
+
+        const switchButton = event.target.closest(".switch");
+        if (switchButton) {
+          const on = switchButton.classList.toggle("is-on");
+          switchButton.setAttribute("aria-checked", String(on));
+          showToast(on ? "偏好已开启" : "偏好已关闭");
+          return;
+        }
+
+        const key = event.target.closest("[data-key]");
+        if (key) {
+          const input = document.getElementById("message-input");
+          input.value += key.dataset.key;
+          input.focus();
+          return;
+        }
+
+        if (event.target.closest("[data-backspace]")) {
+          const input = document.getElementById("message-input");
+          input.value = input.value.slice(0, -1);
+          input.focus();
+          return;
+        }
+
+        if (event.target.closest("[data-shift]")) {
+          showToast("长按大写键可连续输入大写");
+        }
+      });
+
+      document.getElementById("retry-button").addEventListener("click", () => {
+        beginAnalysis("screenshot");
+      });
+
+      document.getElementById("sim-submit").addEventListener("click", submitSimMessage);
+      document.getElementById("sim-input").addEventListener("keydown", event => {
+        if (event.key === "Enter" && !event.shiftKey) {
+          event.preventDefault();
+          submitSimMessage();
+        }
+      });
+      document.getElementById("api-provider").addEventListener("change", event => {
+        const preset = providerPresets[event.target.value];
+        if (!preset) return;
+        if (preset.endpoint) document.getElementById("api-endpoint").value = preset.endpoint;
+        if (preset.model) document.getElementById("api-model").value = preset.model;
+      });
+
+      loadPersistedState();
+      updateContactUI();
+      populateContactForm();
+      populateApiForm();
+      updateConnectionUI();
+      setComposeKind("me");
+      renderSimThread();
+      renderSimSuggestions();
+      renderAnalysis();
+      safeIconRefresh();
+    })();
+  </script>
+</div>
+
+<script>
+  (() => {
+    const stopGesture = event => event.preventDefault();
+    document.addEventListener("gesturestart", stopGesture, { passive: false });
+    document.addEventListener("gesturechange", stopGesture, { passive: false });
+    document.addEventListener("dblclick", stopGesture, { passive: false });
+
+    let lastTouchEnd = 0;
+    document.addEventListener("touchend", event => {
+      const now = Date.now();
+      if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, { passive: false });
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      });
+    }
+  })();
+</script>
+</body>
+</html>
